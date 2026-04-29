@@ -1,0 +1,86 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "Registered user of the SwiftToll system",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "carNumber": { "type": "string" },
+        "carType": { "type": "string" },
+        "balance": { "type": "number" },
+        "role": { "type": "string", "enum": ["admin", "user"] },
+        "rfid": { "type": "string" },
+        "profilePic": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "email", "carNumber", "carType", "balance", "role"]
+    },
+    "TravelRecord": {
+      "title": "Travel Record",
+      "description": "Record of a vehicle passing through a toll plaza",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "plazaName": { "type": "string" },
+        "amount": { "type": "number" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "plazaName", "amount", "timestamp"]
+    },
+    "BalanceRecord": {
+      "title": "Balance Record",
+      "description": "History of balance changes (recharge or toll deduction)",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "amount": { "type": "number" },
+        "type": { "type": "string", "enum": ["recharge", "toll"] },
+        "status": { "type": "string", "enum": ["pending", "completed", "cancelled"] },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "amount", "type", "status", "timestamp"]
+    }
+  },
+  "firestore": {
+    "users": {
+      "schema": "User",
+      "description": "Collection of users"
+    },
+    "travelHistory": {
+      "schema": "TravelRecord",
+      "description": "Global travel history"
+    },
+    "balanceHistory": {
+      "schema": "BalanceRecord",
+      "description": "Global balance transaction history"
+    },
+    "toll_requests": {
+      "schema": {
+        "type": "object",
+        "properties": {
+          "rfid": { "type": "string" },
+          "toll_number": { "type": "number" },
+          "status": { "type": "string" },
+          "timestamp": { "type": "string" }
+        }
+      },
+      "description": "Hardware requests from ESP32"
+    },
+    "gate_control": {
+      "schema": {
+        "type": "object",
+        "properties": {
+          "state": { "type": "string" },
+          "amount": { "type": "number" },
+          "message": { "type": "string" },
+          "lastRfid": { "type": "string" },
+          "timestamp": { "type": "string" }
+        }
+      },
+      "description": "Control signals and display messages for the hardware gate"
+    }
+  }
+}
