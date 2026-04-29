@@ -222,9 +222,6 @@ export default function App() {
   const [allTravelHistory, setAllTravelHistory] = useState<TravelRecord[]>([]);
   const [userSearch, setUserSearch] = useState('');
   const [reportFilter, setReportFilter] = useState({ date: '', plaza: 'all' });
-  const [hardwareSimulatorRfid, setHardwareSimulatorRfid] = useState('');
-  const [gateStatus, setGateStatus] = useState<any>(null);
-  const [isSimulatingHardware, setIsSimulatingHardware] = useState(false);
   const [rechargeAmount, setRechargeAmount] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [adminRequests, setAdminRequests] = useState<BalanceRecord[]>([]);
@@ -270,23 +267,7 @@ export default function App() {
     }
   };
 
-  const triggerHardwareSimulation = async () => {
-    if (!hardwareSimulatorRfid) return alert('RFID লিখুন');
-    setIsSimulatingHardware(true);
-    try {
-      await addDoc(collection(db, 'toll_requests'), {
-        rfid: hardwareSimulatorRfid,
-        toll_number: 1,
-        status: 'pending',
-        timestamp: new Date().toISOString()
-      });
-      // The listener will catch this and process it
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsSimulatingHardware(false);
-    }
-  };
+
   const handleAdjustBalance = async (userId: string) => {
     const amountStr = prompt('ব্যালেন্স অ্যাডজাস্টমেন্ট পরিমাণ লিখুন (টাকা যোগ করতে পজিটিভ, কাটতে নেগেটিভ সংখ্যা দিন):');
     if (!amountStr || isNaN(parseFloat(amountStr))) return;
@@ -466,41 +447,10 @@ export default function App() {
       });
     });
 
-    // 2. Monitor status (App -> ESP32)
-    const gateStatusDocRef = doc(db, 'gate_control', 'status');
-    const unsubStatus = onSnapshot(gateStatusDocRef, (docSnap) => {
-      if (docSnap.exists()) {
-        setGateStatus(docSnap.data());
-      }
-    });
-
-    return () => { unsubRequest(); unsubStatus(); };
+    return () => { unsubRequest(); };
   }, []);
 
-  const simulateToll = async (tollNumber: number) => {
-    if (user) {
-      setIsLoading(true);
-      try {
-        const rfid = user.rfid || `TEST-${user.id.substring(0, 5)}`;
-        if (!user.rfid) {
-          await firebaseService.updateUser({ ...user, rfid });
-        }
-        
-        await addDoc(collection(db, 'toll_requests'), {
-          rfid,
-          toll_number: tollNumber,
-          status: 'pending',
-          timestamp: new Date().toISOString()
-        });
-        // We do not refreshData or alert yet, the global listener watches for it.
-      } catch (error) {
-        console.error("Simulation error:", error);
-        alert("সিমুলেশন ব্যর্থ হয়েছে।");
-      } finally {
-        setIsLoading(false);
-      }
-    }
-  };
+
 
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
 
@@ -612,9 +562,9 @@ export default function App() {
             <motion.div 
               initial={{ y: -20 }}
               animate={{ y: 0 }}
-              className="w-20 h-20 bg-slate-900 rounded-[2rem] mx-auto flex items-center justify-center mb-6 shadow-2xl shadow-slate-300"
+              className="w-20 h-20 bg-slate-900 rounded-[2rem] mx-auto flex items-center justify-center mb-6 shadow-2xl shadow-slate-300 overflow-hidden"
             >
-              <CreditCard className="text-white w-10 h-10" />
+              <img src="https://i.postimg.cc/L5ZtB5vr/1777431738491-2.jpg" alt="Logo" className="w-full h-full object-cover" />
             </motion.div>
             <h1 className="text-4xl font-display font-bold text-slate-900 tracking-tight">SwiftToll</h1>
             <p className="text-slate-500 mt-2 font-medium">স্মার্ট হাইওয়ে, স্মার্ট পেমেন্ট</p>
@@ -782,9 +732,9 @@ export default function App() {
           <div className="flex items-center gap-4">
             <motion.div 
               whileHover={{ rotate: 5 }}
-              className="w-12 h-12 bg-slate-900 rounded-2xl flex items-center justify-center shadow-lg shadow-slate-200"
+              className="w-12 h-12 bg-slate-900 rounded-2xl flex items-center justify-center shadow-lg shadow-slate-200 overflow-hidden"
             >
-              <CreditCard className="text-white w-6 h-6" />
+              <img src="https://i.postimg.cc/L5ZtB5vr/1777431738491-2.jpg" alt="Logo" className="w-full h-full object-cover" />
             </motion.div>
             <div className="hidden xs:block">
               <h2 className="font-display font-bold text-slate-900 leading-tight text-xl tracking-tight">SwiftToll</h2>
@@ -890,40 +840,6 @@ export default function App() {
                   </div>
                 </Card>
               </motion.div>
-
-              <Card id="esp32-sim-card" className="border-dashed border-2 border-slate-200 bg-white/50">
-                <h4 className="font-display font-bold text-slate-800 mb-3 flex items-center gap-2">
-                  <Car className="w-5 h-5 text-indigo-600" /> গেট সিমুলেশন
-                </h4>
-                <p className="text-xs text-slate-500 mb-6 leading-relaxed">
-                  নিচে ক্লিক করে গেট পার হওয়ার সিমুলেশন করুন। এটি রিয়েল-টাইমে ব্যালেন্স আপডেট করবে।
-                </p>
-                <div className="grid grid-cols-2 gap-3">
-                  <button 
-                    onClick={() => simulateToll(1)}
-                    disabled={isLoading}
-                    className="flex flex-col items-center justify-center p-4 rounded-2xl bg-indigo-50 border border-indigo-100 hover:bg-indigo-100 hover:border-indigo-200 transition-all group disabled:opacity-50"
-                  >
-                    <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center mb-2 shadow-sm group-hover:scale-110 transition-transform">
-                      <Car className="w-5 h-5 text-indigo-600" />
-                    </div>
-                    <span className="text-xs font-bold text-indigo-900 mb-1">পদ্মা সেতু</span>
-                    <span className="text-[10px] font-bold text-indigo-400 uppercase">৳ ১০০</span>
-                  </button>
-                  
-                  <button 
-                    onClick={() => simulateToll(2)}
-                    disabled={isLoading}
-                    className="flex flex-col items-center justify-center p-4 rounded-2xl bg-emerald-50 border border-emerald-100 hover:bg-emerald-100 hover:border-emerald-200 transition-all group disabled:opacity-50"
-                  >
-                    <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center mb-2 shadow-sm group-hover:scale-110 transition-transform">
-                      <Car className="w-5 h-5 text-emerald-600" />
-                    </div>
-                    <span className="text-xs font-bold text-emerald-900 mb-1">ইব্রাহিম (আঃ) সড়ক</span>
-                    <span className="text-[10px] font-bold text-emerald-400 uppercase">৳ ৫০</span>
-                  </button>
-                </div>
-              </Card>
 
               <Card id="recharge-card" title="কুইক রিচার্জ">
                 <form onSubmit={handleRecharge} className="space-y-4">
@@ -1108,60 +1024,6 @@ export default function App() {
 
             {activeAdminTab === 'requests' ? (
               <div className="space-y-8">
-                <Card title="হার্ডওয়্যার সিমুলেটর (ESP32 টেস্ট)">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-                    <div className="space-y-4">
-                      <p className="text-sm text-slate-600 font-medium leading-relaxed">
-                        এই সেকশনটি ESP32 বা হার্ডওয়্যার ডিভাইসকে সিমুলেট করে। এখানে RFID ইনপুট দিলে সিস্টেমটি `toll_requests/current` এ ডেটা পাঠাবে এবং ব্যাকএন্ড প্রসেস করার পর `gate_control/status` এ রেজাল্ট আপডেট করবে।
-                      </p>
-                      <div className="relative">
-                        <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                        <input 
-                          type="text" 
-                          placeholder="RFID চিপ নম্বর (যেমন: RFID-1234)" 
-                          value={hardwareSimulatorRfid}
-                          onChange={(e) => setHardwareSimulatorRfid(e.target.value)}
-                          className="w-full pl-11 pr-4 py-4 rounded-2xl border border-slate-100 bg-slate-50 focus:ring-4 focus:ring-indigo-50 outline-none transition-all text-sm font-bold"
-                        />
-                      </div>
-                      <Button 
-                        onClick={triggerHardwareSimulation} 
-                        disabled={isSimulatingHardware}
-                        className="w-full py-4 shadow-xl shadow-indigo-100"
-                        icon={isSimulatingHardware ? Clock : CheckCircle2}
-                      >
-                        {isSimulatingHardware ? 'প্রসেসিং...' : 'রিয়েল-টাইম গেট ট্রিগার'}
-                      </Button>
-                    </div>
-
-                    <div className={`p-8 rounded-3xl border-2 transition-all flex flex-col items-center justify-center text-center space-y-4 ${
-                      !gateStatus ? 'bg-slate-50 border-slate-100 italic text-slate-400' :
-                      gateStatus.state === 'success' ? 'bg-emerald-50 border-emerald-100 text-emerald-900 shadow-lg shadow-emerald-100' :
-                      'bg-rose-50 border-rose-100 text-rose-900 shadow-lg shadow-rose-100'
-                    }`}>
-                      {!gateStatus ? (
-                        <>
-                          <Clock className="w-12 h-12 opacity-10 mb-2" />
-                          <p className="font-bold">ডিভাইস ফিডব্যাক এখানে দেখা যাবে</p>
-                        </>
-                      ) : (
-                        <>
-                          <div className={`w-16 h-16 rounded-3xl flex items-center justify-center text-white mb-2 shadow-xl ${
-                            gateStatus.state === 'success' ? 'bg-emerald-500 shadow-emerald-200' : 'bg-rose-500 shadow-rose-200'
-                          }`}>
-                            {gateStatus.state === 'success' ? <CheckCircle2 className="w-8 h-8" /> : <XCircle className="w-8 h-8" />}
-                          </div>
-                          <div>
-                            <p className="text-2xl font-display font-bold uppercase tracking-tight">{gateStatus.message}</p>
-                            <p className="text-xs font-bold opacity-60 mt-1">RFID: {gateStatus.lastRfid}</p>
-                          </div>
-                          <p className="text-[10px] uppercase tracking-widest font-black opacity-30">Hardware Display Mockup</p>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </Card>
-
                 <Card title="রিচার্জ অনুরোধ">
                 <div className="mb-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="p-5 bg-amber-50 rounded-2xl border border-amber-100 flex items-center justify-between">
