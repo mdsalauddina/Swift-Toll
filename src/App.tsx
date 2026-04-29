@@ -1311,14 +1311,14 @@ export default function App() {
                 
                 {/* 1. Summary Statistics */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  <Card className="bg-indigo-600 text-white border-none p-6 shadow-xl shadow-indigo-200">
-                    <p className="text-indigo-100 text-[10px] font-bold uppercase tracking-widest mb-2 flex items-center gap-2">
-                       <TrendingUp className="w-3.5 h-3.5" /> মোট আদায়কৃত টোল
+                  <Card className="bg-white border-slate-100 p-6">
+                    <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-2 flex items-center gap-2">
+                       <TrendingUp className="w-3.5 h-3.5 text-indigo-500" /> মোট আদায়কৃত টোল
                     </p>
-                    <h3 className="text-3xl font-display font-bold" >
+                    <h3 className="text-3xl font-display font-bold text-slate-900">
                       ৳{calculateTotalIncome().toLocaleString()}
                     </h3>
-                    <p className="text-[10px] text-indigo-200 font-bold mt-2 flex items-center gap-1">
+                    <p className="text-[10px] text-slate-500 font-bold mt-2 flex items-center gap-1">
                       আজ পর্যন্ত সর্বমোট সংগ্রহ
                     </p>
                   </Card>
