@@ -473,6 +473,7 @@ export const firebaseService = {
             state: "fail", 
             message: "ভুল RFID! রেজিস্টার্ড নয়",
             lastRfid: rfid,
+            tollNumber: tollNumber,
             timestamp: new Date().toISOString()
           });
           transaction.update(tollRequestRef, { status: "fail" });
@@ -494,6 +495,7 @@ export const firebaseService = {
             amount: amount,
             message: `ওয়েলকাম! ৳${amount} পরিশোধিত`,
             lastRfid: rfid,
+            tollNumber: tollNumber,
             timestamp: new Date().toISOString()
           });
           
@@ -524,6 +526,7 @@ export const firebaseService = {
             state: "fail", 
             message: "ব্যালেন্স নেই! রিচার্জ করুন",
             lastRfid: rfid,
+            tollNumber: tollNumber,
             timestamp: new Date().toISOString()
           });
           transaction.update(tollRequestRef, { status: "fail" });
