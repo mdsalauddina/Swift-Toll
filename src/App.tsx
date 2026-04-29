@@ -1315,7 +1315,7 @@ export default function App() {
                     <p className="text-indigo-100 text-[10px] font-bold uppercase tracking-widest mb-2 flex items-center gap-2">
                        <TrendingUp className="w-3.5 h-3.5" /> মোট আদায়কৃত টোল
                     </p>
-                    <h3 className="text-3xl font-display font-bold">
+                    <h3 className="text-3xl font-display font-bold" style="color: black;" >
                       ৳{calculateTotalIncome().toLocaleString()}
                     </h3>
                     <p className="text-[10px] text-indigo-200 font-bold mt-2 flex items-center gap-1">
