@@ -471,7 +471,7 @@ export const firebaseService = {
         if (usersSnap.empty) {
           transaction.set(gateControlRef, { 
             state: "fail", 
-            message: "ভুল RFID! রেজিস্টার্ড নয়",
+            message: "Invalid RFID!",
             lastRfid: rfid,
             tollNumber: tollNumber,
             timestamp: new Date().toISOString()
@@ -493,7 +493,7 @@ export const firebaseService = {
           transaction.set(gateControlRef, { 
             state: "success", 
             amount: amount,
-            message: `ওয়েলকাম! ৳${amount} পরিশোধিত`,
+            message: `Welcome! Tk${amount} Paid`,
             lastRfid: rfid,
             tollNumber: tollNumber,
             timestamp: new Date().toISOString()
@@ -524,7 +524,7 @@ export const firebaseService = {
           // Fail Path: Insufficient Balance
           transaction.set(gateControlRef, { 
             state: "fail", 
-            message: "ব্যালেন্স নেই! রিচার্জ করুন",
+            message: "Low Balance! Recharge",
             lastRfid: rfid,
             tollNumber: tollNumber,
             timestamp: new Date().toISOString()
