@@ -29,7 +29,7 @@ body {
 }
 
 .premium-card {
-  @apply bg-white dark:bg-slate-900 dark:border-slate-800 dark:border border-transparent shadow-sm rounded-[24px] overflow-hidden transition-shadow duration-300;
+  @apply bg-white dark:bg-slate-900 border border-transparent dark:border-slate-800 shadow-sm rounded-[24px] overflow-hidden transition-shadow duration-300;
   box-shadow:
     0 4px 6px -1px rgb(0 0 0 / 0.02),
     0 2px 4px -2px rgb(0 0 0 / 0.02),
@@ -37,7 +37,7 @@ body {
 }
 
 .premium-card:hover {
-  @apply sm:shadow-md sm:shadow-slate-200/50 dark:sm:shadow-indigo-900/10;
+  @apply sm:shadow-md sm:shadow-slate-200/50 dark:sm:shadow-slate-900/50;
 }
 
 .glass-morphism {
