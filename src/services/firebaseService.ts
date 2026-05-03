@@ -442,17 +442,21 @@ export const firebaseService = {
     }
   },
 
-  processPendingTollRequest: async (requestId: string, rfid: string, tollNumber: number) => {
+  processPendingTollRequest: async (requestId: string, rfid: string, tollNumber: number | string) => {
     const path = `toll_requests/${requestId}`;
     
     // Determine fee and plaza based on toll_number
     let amount = 100;
-    let plaza = 'হার্ডওয়্যার গেট';
-    if (tollNumber === 1) {
-       plaza = 'পদ্মা সেতু টোল প্লাজা';
+    let plaza = 'Hardware Gate';
+    
+    // Make sure it handles both string and number parsing safely
+    const tollNum = Number(tollNumber);
+
+    if (tollNum === 1) {
+       plaza = 'Padma Bridge Toll Plaza';
        amount = 100;
-    } else if (tollNumber === 2) {
-       plaza = 'ইব্রাহিম (আঃ) সড়ক';
+    } else if (tollNum === 2) {
+       plaza = 'Ibrahim (A:) Road';
        amount = 50;
     }
 
@@ -473,10 +477,11 @@ export const firebaseService = {
             state: "fail", 
             message: "Invalid RFID!",
             lastRfid: rfid,
+            lastReqId: requestId,
             tollNumber: tollNumber,
             timestamp: new Date().toISOString()
           });
-          transaction.update(tollRequestRef, { status: "fail" });
+          transaction.update(tollRequestRef, { status: "fail", message: "Invalid RFID!" });
           return;
         }
         
@@ -490,11 +495,13 @@ export const firebaseService = {
           const newBalance = freshUserData.balance - amount;
           transaction.update(actualUserRef, { balance: newBalance });
           
+          const successMsg = `Welcome! Tk${amount} Paid`;
           transaction.set(gateControlRef, { 
             state: "success", 
             amount: amount,
-            message: `Welcome! Tk${amount} Paid`,
+            message: successMsg,
             lastRfid: rfid,
+            lastReqId: requestId,
             tollNumber: tollNumber,
             timestamp: new Date().toISOString()
           });
@@ -514,22 +521,24 @@ export const firebaseService = {
             amount,
             type: 'toll',
             status: 'completed',
-            note: `${plaza}-এ টোল`,
+            note: `${plaza} Toll`,
             timestamp: new Date().toISOString()
           });
 
-          transaction.update(tollRequestRef, { status: "complete" });
+          transaction.update(tollRequestRef, { status: "complete", message: successMsg });
 
         } else {
           // Fail Path: Insufficient Balance
+          const failMsg = "Low Balance! Recharge";
           transaction.set(gateControlRef, { 
             state: "fail", 
-            message: "Low Balance! Recharge",
+            message: failMsg,
             lastRfid: rfid,
+            lastReqId: requestId,
             tollNumber: tollNumber,
             timestamp: new Date().toISOString()
           });
-          transaction.update(tollRequestRef, { status: "fail" });
+          transaction.update(tollRequestRef, { status: "fail", message: failMsg });
         }
       });
     } catch (error: any) {
