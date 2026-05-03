@@ -70,7 +70,7 @@ const Card = ({
  id?: string;
  title?: string;
 }) => (
- <div id={id} className={`premium-card p-5 sm:p-8 ${className}`}>
+ <div id={id} className={`premium-card p-5 sm:p-8 dark:border-slate-800/50 ${className}`}>
  {title && (
  <h4 className="font-display font-bold text-slate-900 mb-6 tracking-tight text-lg sm:text-xl dark:text-white">
  {title}
@@ -95,7 +95,7 @@ const Button = ({
  "bg-slate-900 dark:bg-indigo-600 text-white hover:bg-slate-800 dark:hover:bg-indigo-500 shadow-xl shadow-slate-200 dark:shadow-none",
  secondary: "bg-indigo-50 text-indigo-700 hover:bg-indigo-100",
  outline:
- "border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:bg-slate-800 hover:border-slate-300",
+ "border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:bg-slate-800 hover:border-slate-300",
  ghost: "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:bg-slate-800/50",
  };
  return (
@@ -122,12 +122,12 @@ const Badge = ({
  status: string;
 }) => {
  const styles: any = {
- completed: "bg-emerald-50 text-emerald-700 border-emerald-100/50",
- pending: "bg-amber-50 text-amber-700 border-amber-100/50",
- cancelled: "bg-rose-50 text-rose-700 border-rose-100/50",
- toll: "bg-indigo-50 text-indigo-700 border-indigo-100/50",
- recharge: "bg-emerald-50 text-emerald-700 border-emerald-100/50",
- };
+    completed: "bg-emerald-50 text-emerald-700 border-emerald-100/50 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20",
+    pending: "bg-amber-50 text-amber-700 border-amber-100/50 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20",
+    cancelled: "bg-rose-50 text-rose-700 border-rose-100/50 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/20",
+    toll: "bg-indigo-50 text-indigo-700 border-indigo-100/50 dark:bg-indigo-500/10 dark:text-indigo-400 dark:border-indigo-500/20",
+    recharge: "bg-emerald-50 text-emerald-700 border-emerald-100/50 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20",
+  };
  return (
  <span
  className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${styles[status] || styles.pending}`}
@@ -157,7 +157,7 @@ const Modal = ({ isOpen, onClose, title, children, id }: any) => (
  exit={{ opacity: 0, scale: 0.95, y: 20 }}
  className="relative bg-white rounded-[24px] w-full max-w-lg overflow-hidden shadow-2xl flex flex-col max-h-[90vh] dark:bg-slate-900"
  >
- <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center sticky top-0 bg-white backdrop-blur-md z-10 shrink-0 dark:border-slate-700/50 dark:bg-slate-900">
+ <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center sticky top-0 bg-white backdrop-blur-md z-10 shrink-0 dark:border-slate-800/60 dark:bg-slate-900">
  <h3 className="text-xl font-bold text-slate-900 font-display dark:text-white">
  {title}
  </h3>
@@ -228,7 +228,7 @@ const UserHistoryView = ({
  return (
  <div className="space-y-6">
  <div className="grid grid-cols-2 gap-4">
- <div className="bg-indigo-50 p-4 rounded-2xl border border-indigo-100 dark:bg-indigo-500/10">
+ <div className="bg-indigo-50 p-4 rounded-2xl border border-indigo-100 dark:bg-indigo-500/5">
  <p className="text-[10px] text-indigo-400 uppercase font-bold tracking-widest mb-1 dark:text-indigo-300">
  মোট ভ্রমণ
  </p>
@@ -253,7 +253,7 @@ const UserHistoryView = ({
  {travels.map((item) => (
  <div
  key={item.id}
- className="flex justify-between items-center p-3 bg-slate-50 rounded-xl dark:bg-slate-800/80"
+ className="flex justify-between items-center p-3 bg-slate-50 rounded-xl dark:bg-slate-800/40"
  >
  <div>
  <p className="font-bold text-slate-900 text-sm dark:text-white">
@@ -280,7 +280,7 @@ const UserHistoryView = ({
  {balances.map((item) => (
  <div
  key={item.id}
- className="flex justify-between items-center p-3 bg-slate-50 rounded-xl dark:bg-slate-800/80"
+ className="flex justify-between items-center p-3 bg-slate-50 rounded-xl dark:bg-slate-800/40"
  >
  <div>
  <p className="font-bold text-slate-900 text-sm dark:text-white">
@@ -523,7 +523,44 @@ export default function App() {
  refreshData();
  };
 
- const handleDirectRecharge = async (userId: string) => {
+ 
+  const handleDownloadUserData = () => {
+    if (!user) return;
+    
+    let dataToExport: any[] = [];
+    if (activeTab === "travel") {
+      dataToExport = travelHistory.map(t => ({
+        "তারিখ": new Date(t.timestamp).toLocaleString("bn-BD"),
+        "প্লাজা": t.plazaName,
+        "পরিমাণ": "৳" + t.amount,
+        "ধরণ": "টোল"
+      }));
+    } else {
+      dataToExport = balanceHistory.map(b => ({
+        "তারিখ": new Date(b.timestamp).toLocaleString("bn-BD"),
+        "ধরণ": b.type === "recharge" ? "রিচার্জ" : "টোল",
+        "পরিমাণ": "৳" + b.amount,
+        "অবস্থা": b.status === "completed" ? "সফল" : b.status === "pending" ? "পেন্ডিং" : "বাতিল"
+      }));
+    }
+
+    if (dataToExport.length === 0) return alert("ডাউনলোড করার মত কোনো ডাটা নেই");
+
+    const header = Object.keys(dataToExport[0]).join(",");
+    const csvRows = dataToExport.map(row => 
+      Object.values(row).map(value => '"' + String(value).replace(/"/g, '""') + '"').join(",")
+    );
+    const csvContent = [header, ...csvRows].join("\n");
+    const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = user.name + "_" + (activeTab === "travel" ? "travel" : "payment") + "_history.csv";
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleDirectRecharge = async (userId: string) => {
  const amountStr = prompt("সরাসরি রিচার্জের পরিমাণ লিখুন (৳):");
  if (amountStr && !isNaN(parseFloat(amountStr))) {
  const amount = parseFloat(amountStr);
@@ -936,7 +973,7 @@ export default function App() {
  type="email"
  value={authEmail}
  onChange={(e) => setAuthEmail(e.target.value)}
- className="w-full px-5 py-4 rounded-2xl border border-slate-100 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-indigo-50 focus:border-indigo-200 focus:outline-none transition-all font-medium dark:border-slate-700/50 dark:bg-slate-800/80 dark:focus:bg-slate-900 dark:focus:ring-slate-700 dark:focus:border-slate-600"
+ className="w-full px-5 py-4 rounded-2xl border border-slate-100 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-indigo-50 focus:border-indigo-200 focus:outline-none transition-all font-medium dark:border-slate-800/60 dark:bg-slate-800/40 dark:focus:bg-slate-900 dark:focus:ring-slate-700 dark:focus:border-slate-600"
  placeholder="name@example.com"
  required
  />
@@ -949,7 +986,7 @@ export default function App() {
  type="password"
  value={authPassword}
  onChange={(e) => setAuthPassword(e.target.value)}
- className="w-full px-5 py-4 rounded-2xl border border-slate-100 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-indigo-50 focus:border-indigo-200 focus:outline-none transition-all font-medium dark:border-slate-700/50 dark:bg-slate-800/80 dark:focus:bg-slate-900 dark:focus:ring-slate-700 dark:focus:border-slate-600"
+ className="w-full px-5 py-4 rounded-2xl border border-slate-100 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-indigo-50 focus:border-indigo-200 focus:outline-none transition-all font-medium dark:border-slate-800/60 dark:bg-slate-800/40 dark:focus:bg-slate-900 dark:focus:ring-slate-700 dark:focus:border-slate-600"
  placeholder="••••••••"
  required
  />
@@ -988,7 +1025,7 @@ export default function App() {
  onChange={(e) =>
  setNewUser({ ...newUser, name: e.target.value })
  }
- className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-indigo-50 outline-none transition-all dark:border-slate-700/50 dark:bg-slate-800/80 dark:focus:bg-slate-900 dark:focus:ring-slate-700"
+ className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-indigo-50 outline-none transition-all dark:border-slate-800/60 dark:bg-slate-800/40 dark:focus:bg-slate-900 dark:focus:ring-slate-700"
  placeholder="আপনার নাম"
  required
  />
@@ -1003,7 +1040,7 @@ export default function App() {
  onChange={(e) =>
  setNewUser({ ...newUser, carNumber: e.target.value })
  }
- className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-indigo-50 outline-none transition-all dark:border-slate-700/50 dark:bg-slate-800/80 dark:focus:bg-slate-900 dark:focus:ring-slate-700"
+ className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-indigo-50 outline-none transition-all dark:border-slate-800/60 dark:bg-slate-800/40 dark:focus:bg-slate-900 dark:focus:ring-slate-700"
  placeholder="যেমন: ঢাকা-মেট্রো..."
  required
  />
@@ -1017,7 +1054,7 @@ export default function App() {
  onChange={(e) =>
  setNewUser({ ...newUser, carType: e.target.value })
  }
- className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-indigo-50 outline-none transition-all appearance-none dark:border-slate-700/50 dark:bg-slate-800/80 dark:focus:bg-slate-900 dark:focus:ring-slate-700"
+ className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-indigo-50 outline-none transition-all appearance-none dark:border-slate-800/60 dark:bg-slate-800/40 dark:focus:bg-slate-900 dark:focus:ring-slate-700"
  required
  >
  <option value="Mini Car">ছোট গাড়ি (৳৬০)</option>
@@ -1036,7 +1073,7 @@ export default function App() {
  onChange={(e) =>
  setNewUser({ ...newUser, email: e.target.value })
  }
- className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-indigo-50 outline-none transition-all dark:border-slate-700/50 dark:bg-slate-800/80 dark:focus:bg-slate-900 dark:focus:ring-slate-700"
+ className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-indigo-50 outline-none transition-all dark:border-slate-800/60 dark:bg-slate-800/40 dark:focus:bg-slate-900 dark:focus:ring-slate-700"
  placeholder="email@example.com"
  required
  />
@@ -1051,7 +1088,7 @@ export default function App() {
  onChange={(e) =>
  setNewUser({ ...newUser, password: e.target.value })
  }
- className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-indigo-50 outline-none transition-all dark:border-slate-700/50 dark:bg-slate-800/80 dark:focus:bg-slate-900 dark:focus:ring-slate-700"
+ className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-indigo-50 outline-none transition-all dark:border-slate-800/60 dark:bg-slate-800/40 dark:focus:bg-slate-900 dark:focus:ring-slate-700"
  placeholder="••••••••"
  required
  />
@@ -1123,6 +1160,23 @@ export default function App() {
 
         </div>
 
+        {user?.role === "admin" && (
+          <div className="flex bg-slate-100 p-1 rounded-[16px] border border-slate-200 dark:bg-slate-800/50 dark:border-slate-800">
+            <button
+              onClick={() => setViewMode("user")}
+              className={`px-3 sm:px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all whitespace-nowrap ${viewMode === "user" ? "bg-slate-900 dark:bg-indigo-600 text-white shadow-lg" : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:text-slate-300"}`}
+            >
+              User
+            </button>
+            <button
+              onClick={() => setViewMode("admin")}
+              className={`px-3 sm:px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all whitespace-nowrap ${viewMode === "admin" ? "bg-slate-900 dark:bg-indigo-600 text-white shadow-lg" : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:text-slate-300"}`}
+            >
+              Admin
+            </button>
+          </div>
+        )}
+
         <div className="flex items-center gap-2 sm:gap-4 shrink-0">
           <div className="text-right hidden sm:block">
             <p className="text-sm font-bold text-slate-900 dark:text-white">{user?.name}</p>
@@ -1138,14 +1192,14 @@ export default function App() {
 
           <button
             onClick={() => setIsDarkMode(!isDarkMode)}
-            className="relative w-10 h-10 sm:w-11 sm:h-11 rounded-[16px] bg-slate-50 hover:bg-slate-100 flex items-center justify-center border border-slate-100 transition-all shrink-0 mr-2 dark:bg-slate-800 dark:hover:bg-slate-700 dark:border-slate-700/50"
+            className="relative w-10 h-10 sm:w-11 sm:h-11 rounded-[16px] bg-slate-50 hover:bg-slate-100 flex items-center justify-center border border-slate-100 transition-all shrink-0 mr-2 dark:bg-slate-800 dark:hover:bg-slate-700 dark:border-slate-800/60"
           >
             {isDarkMode ? <Sun className="w-5 h-5 text-amber-500" /> : <Moon className="w-5 h-5 text-slate-600 dark:text-slate-400" />}
           </button>
 
           <button
             onClick={() => setShowNotifications(!showNotifications)}
-            className="relative w-10 h-10 sm:w-11 sm:h-11 rounded-[16px] bg-slate-50 hover:bg-slate-100 flex items-center justify-center border border-slate-100 transition-all shrink-0 dark:bg-slate-800 dark:hover:bg-slate-800/50 dark:border-slate-700/50"
+            className="relative w-10 h-10 sm:w-11 sm:h-11 rounded-[16px] bg-slate-50 hover:bg-slate-100 flex items-center justify-center border border-slate-100 transition-all shrink-0 dark:bg-slate-800 dark:hover:bg-slate-800/50 dark:border-slate-800/60"
             id="notification-button"
           >
             <Bell className="w-5 h-5 text-slate-600 dark:text-slate-400" />
@@ -1160,9 +1214,9 @@ export default function App() {
                 initial={{ opacity: 0, y: 10, scale: 0.95 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                className="absolute right-0 top-16 w-80 bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden z-50 flex flex-col max-h-[400px] dark:bg-slate-900 dark:border-slate-700/50"
+                className="absolute right-0 top-16 w-80 bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden z-50 flex flex-col max-h-[400px] dark:bg-slate-900 dark:border-slate-800/60"
               >
-                <div className="p-4 border-b border-slate-50 bg-slate-50 flex justify-between items-center sticky top-0 dark:bg-slate-800/50 dark:border-slate-700/50">
+                <div className="p-4 border-b border-slate-50 bg-slate-50 flex justify-between items-center sticky top-0 dark:bg-slate-800/50 dark:border-slate-800/60">
                   <h4 className="font-bold text-slate-900 text-sm dark:text-white">নোটিফিকেশন</h4>
                   {unreadCount > 0 && (
                     <button
@@ -1178,7 +1232,7 @@ export default function App() {
                     notifications.map((notif) => (
                       <div
                         key={notif.id}
-                        className={`p-3 rounded-xl mb-1 ${notif.read ? "opacity-75" : "bg-indigo-50/50 dark:bg-indigo-500/10"}`}
+                        className={`p-3 rounded-xl mb-1 ${notif.read ? "opacity-75" : "bg-indigo-50/50 dark:bg-indigo-500/5"}`}
                       >
                         <p className="text-sm font-medium text-slate-900 dark:text-white">{notif.title}</p>
                         <p className="text-xs text-slate-500 mt-1 dark:text-slate-400">{notif.message}</p>
@@ -1204,7 +1258,7 @@ export default function App() {
       </div>
     </header>
 
-    <main className="max-w-6xl mx-auto px-4 sm:px-6">
+    <main className="max-w-6xl mx-auto px-4 sm:px-6 pt-4 sm:pt-6 pb-20 dark:bg-slate-950 transition-colors duration-500">
       {viewMode === "user" ? (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8">
           <div className="lg:col-span-4 space-y-6">
@@ -1214,9 +1268,9 @@ export default function App() {
             >
               <Card
                 id="balance-card"
-                className="bg-white border-2 border-slate-200 overflow-hidden relative min-h-[240px] flex flex-col justify-between shadow-xl dark:bg-slate-900 dark:border-slate-700 dark:shadow-none"
+                className="bg-white border-2 border-slate-200 overflow-hidden relative min-h-[240px] flex flex-col justify-between shadow-xl dark:bg-slate-900/80 dark:border-slate-800 dark:shadow-none dark:backdrop-blur-sm"
               >
-                <div className="absolute top-[-20%] right-[-10%] w-64 h-64 bg-indigo-50 rounded-full blur-3xl dark:bg-indigo-500/10" />
+                <div className="absolute top-[-20%] right-[-10%] w-64 h-64 bg-indigo-50 rounded-full blur-3xl dark:bg-indigo-500/5" />
                 <div className="absolute bottom-[-10%] left-[-10%] w-48 h-48 bg-emerald-50 rounded-full blur-3xl dark:bg-emerald-500/10" />
                 
                 <div className="relative z-10 flex justify-between items-start mb-8">
@@ -1225,7 +1279,7 @@ export default function App() {
                     <span className="text-sm font-bold text-indigo-600 uppercase tracking-widest dark:text-indigo-400">ব্যালেন্স</span>
                   </div>
                   <div className="flex gap-1">
-                    <div className="w-8 h-5 bg-slate-100 rounded border border-slate-200 dark:bg-slate-800/50 dark:border-slate-700" />
+                    <div className="w-8 h-5 bg-slate-100 rounded border border-slate-200 dark:bg-slate-800/50 dark:border-slate-800" />
                     <div className="w-4 h-4 rounded-full bg-slate-100 dark:bg-slate-800/50" />
                   </div>
                 </div>
@@ -1240,7 +1294,7 @@ export default function App() {
                   </h3>
                 </div>
 
-                <div className="relative z-10 flex justify-between items-end pt-6 border-t border-slate-100 mt-6 dark:border-slate-700/50">
+                <div className="relative z-10 flex justify-between items-end pt-6 border-t border-slate-100 mt-6 dark:border-slate-800/60">
                   <div>
                     <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold mb-1 dark:text-slate-400">
                       গাড়ি নম্বর
@@ -1266,7 +1320,7 @@ export default function App() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
             >
-              <div className="flex justify-between items-center text-[10px] text-slate-400 font-bold uppercase tracking-widest bg-slate-50 p-2 rounded-xl border border-slate-100 mb-2 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700/50">
+              <div className="flex justify-between items-center text-[10px] text-slate-400 font-bold uppercase tracking-widest bg-slate-50 p-2 rounded-xl border border-slate-100 mb-2 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-800/60">
                 <span className="text-[8px] text-slate-400 dark:text-slate-400">
                   সর্বশেষ রিচার্জ
                 </span>
@@ -1279,16 +1333,18 @@ export default function App() {
               </div>
 
               <div className="relative group">
-                <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-indigo-600 transition-colors z-10 dark:text-slate-400 dark:group-focus-within:text-indigo-400" />
-                <span className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-lg group-focus-within:text-slate-900 transition-colors dark:text-slate-400 dark:group-focus-within:text-white">
-                  ৳
-                </span>
+                <div className="absolute left-5 top-1/2 -translate-y-1/2 flex items-center gap-2 pointer-events-none z-10">
+                  <Wallet className="w-5 h-5 text-slate-400 group-focus-within:text-indigo-600 transition-colors dark:text-slate-400 dark:group-focus-within:text-indigo-400" />
+                  <span className="text-slate-400 font-bold text-lg group-focus-within:text-slate-900 transition-colors dark:text-slate-400 dark:group-focus-within:text-white">
+                    ৳
+                  </span>
+                </div>
                 <input
                   type="number"
                   value={rechargeAmount}
                   onChange={(e) => setRechargeAmount(e.target.value)}
-                  placeholder="পরিমাণ"
-                  className="w-full pl-10 pr-4 py-4 rounded-2xl border border-slate-100 bg-slate-50 group-focus-within:bg-white group-focus-within:ring-4 group-focus-within:ring-indigo-50 group-focus-within:border-indigo-200 transition-all outline-none font-display font-bold text-xl dark:border-slate-700/50 dark:bg-slate-800/80 dark:group-focus-within:bg-slate-900 dark:group-focus-within:ring-slate-700 dark:group-focus-within:border-slate-600"
+                  placeholder="পরিমাণ লিখুন"
+                  className="w-full pl-16 pr-4 py-4 rounded-2xl border border-slate-100 bg-slate-50 group-focus-within:bg-white group-focus-within:ring-4 group-focus-within:ring-indigo-50 group-focus-within:border-indigo-200 transition-all outline-none font-display font-bold text-xl dark:border-slate-800/60 dark:bg-slate-800/40 dark:group-focus-within:bg-slate-900 dark:group-focus-within:ring-slate-700 dark:group-focus-within:border-slate-600"
                 />
               </div>
 
@@ -1296,8 +1352,8 @@ export default function App() {
                 className="w-full mt-3 flex items-center justify-center gap-2 py-4"
                 onClick={handleRecharge}
               >
-                <Wallet className="w-5 h-5" />
-                রকেট দিয়ে রিচার্জ করুন
+                <Plus className="w-5 h-5" />
+                রিচার্জ রিকোয়েস্ট পাঠান
               </Button>
             </motion.div>
           </div>
@@ -1308,8 +1364,8 @@ export default function App() {
             transition={{ delay: 0.2 }}
             className="lg:col-span-8 flex flex-col min-h-[500px]"
           >
-            <Card className="p-4 sm:p-6 bg-white border-2 border-slate-200 min-h-full flex flex-col shadow-xl dark:bg-slate-900 dark:border-slate-700">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sticky top-[88px] bg-[#F9FAFB] z-30 py-2 sm:py-0 sm:bg-transparent dark:bg-slate-950 dark:sm:bg-transparent">
+            <Card className="p-4 sm:p-6 bg-white border-2 border-slate-200 min-h-full flex flex-col shadow-xl dark:bg-slate-900/60 dark:border-slate-800 dark:backdrop-blur-xl">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 z-30 py-2 sm:py-0 dark:bg-slate-950 dark:sm:bg-transparent">
               <div className="flex gap-1 bg-slate-100 p-1.5 rounded-2xl w-full sm:w-auto dark:bg-slate-800/50">
                 <button
                   onClick={() => setActiveTab("travel")}
@@ -1327,11 +1383,11 @@ export default function App() {
 
               {activeTab === "travel" && (
                 <button
-                  onClick={() => window.print()}
+                  onClick={handleDownloadUserData}
                   className="text-indigo-600 hover:text-indigo-700 text-sm font-bold flex items-center gap-1.5 group p-2 rounded-xl hover:bg-indigo-50 transition-all self-end sm:self-auto dark:text-indigo-400 dark:hover:bg-indigo-500/20"
                 >
                   <Download className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                  পিডিএফ রিপোর্ট
+                  রিপোর্ট ডাউনলোড
                 </button>
               )}
             </div>
@@ -1354,10 +1410,10 @@ export default function App() {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: idx * 0.1 }}
-                        className="group p-5 rounded-3xl bg-slate-50 border border-transparent hover:border-slate-200 hover:bg-white hover:shadow-xl hover:shadow-slate-100 transition-all flex justify-between items-center dark:bg-slate-800/80 dark:border-transparent dark:hover:border-slate-700 dark:hover:bg-slate-900 dark:hover:shadow-none"
+                        className="group p-5 rounded-3xl bg-slate-50 border border-transparent hover:border-slate-200 hover:bg-white hover:shadow-xl hover:shadow-slate-100 transition-all flex justify-between items-center dark:bg-slate-800/40 dark:border-transparent dark:hover:border-slate-700 dark:hover:bg-slate-900 dark:hover:shadow-none"
                       >
                         <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 rounded-2xl bg-white border border-slate-100 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform dark:bg-slate-900 dark:border-slate-700/50">
+                          <div className="w-12 h-12 rounded-2xl bg-white border border-slate-100 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform dark:bg-slate-900 dark:border-slate-800/60">
                             <MapPin className="w-6 h-6 text-indigo-500 dark:text-indigo-400" />
                           </div>
                           <div>
@@ -1404,7 +1460,7 @@ export default function App() {
  initial={{ opacity: 0, y: 10 }}
  animate={{ opacity: 1, y: 0 }}
  transition={{ delay: idx * 0.05 }}
- className="group p-5 rounded-3xl bg-slate-50 border border-transparent hover:border-slate-200 hover:bg-white hover:shadow-xl hover:shadow-slate-100 transition-all flex justify-between items-center dark:bg-slate-800/80"
+ className="group p-5 rounded-3xl bg-slate-50 border border-transparent hover:border-slate-200 hover:bg-white hover:shadow-xl hover:shadow-slate-100 transition-all flex justify-between items-center dark:bg-slate-800/40"
  >
  <div className="flex items-center gap-5">
  <div
@@ -1461,7 +1517,7 @@ export default function App() {
  )}
  </motion.div>
  </AnimatePresence>
-            <div className="mt-8 pt-8 border-t border-slate-100 flex flex-col items-center text-center dark:border-slate-700/50">
+            <div className="mt-8 pt-8 border-t border-slate-100 flex flex-col items-center text-center dark:border-slate-800/60">
  <div className="flex items-center gap-2 mb-2">
  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest leading-relaxed dark:text-slate-400">
@@ -1555,7 +1611,7 @@ export default function App() {
  <div className="hidden md:block overflow-x-auto">
  <table className="w-full text-left">
  <thead>
- <tr className="border-b border-slate-100 italic font-display dark:border-slate-700/50">
+ <tr className="border-b border-slate-100 italic font-display dark:border-slate-800/60">
  <th className="py-5 font-semibold text-slate-400 text-xs uppercase tracking-widest px-4 dark:text-slate-400">
  ব্যবহারকারী
  </th>
@@ -1656,7 +1712,7 @@ export default function App() {
  return (
  <div
  key={item.id}
- className="p-4 rounded-[20px] bg-slate-50 border border-slate-100 flex flex-col gap-3 dark:bg-slate-800/80 dark:border-slate-700/50"
+ className="p-4 rounded-[20px] bg-slate-50 border border-slate-100 flex flex-col gap-3 dark:bg-slate-800/40 dark:border-slate-800/60"
  >
  <div className="flex justify-between items-center">
  <div>
@@ -1675,7 +1731,7 @@ export default function App() {
  : "বাতিল"}
  </Badge>
  </div>
- <div className="flex justify-between items-center bg-white p-2.5 px-3 rounded-xl shadow-sm border border-slate-100 dark:bg-slate-900 dark:border-slate-700/50">
+ <div className="flex justify-between items-center bg-white p-2.5 px-3 rounded-xl shadow-sm border border-slate-100 dark:bg-slate-900 dark:border-slate-800/60">
  <p className="text-xl font-display font-bold text-slate-900 dark:text-white">
  ৳{item.amount}
  </p>
@@ -1706,7 +1762,7 @@ export default function App() {
  <CheckCircle2 className="w-3.5 h-3.5" /> অনুমোদন
  </button>
  <button
- className="flex-1 bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 rounded-lg py-2 flex items-center justify-center gap-1 text-[11px] font-bold uppercase tracking-wider transition-colors dark:bg-slate-900 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800/80"
+ className="flex-1 bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 rounded-lg py-2 flex items-center justify-center gap-1 text-[11px] font-bold uppercase tracking-wider transition-colors dark:bg-slate-900 dark:border-slate-800 dark:text-slate-300 dark:hover:bg-slate-800/80"
  onClick={() => handleCancelRecharge(item.id)}
  >
  <XCircle className="w-3.5 h-3.5" /> বাতিল
@@ -1738,7 +1794,7 @@ export default function App() {
  placeholder="ইউজার বা গাড়ি খুঁজুন..."
  value={userSearch}
  onChange={(e) => setUserSearch(e.target.value)}
- className="w-full pl-11 pr-4 py-3 rounded-2xl border border-slate-100 bg-white shadow-sm focus:ring-4 focus:ring-indigo-50 outline-none transition-all text-sm font-medium dark:border-slate-700/50 dark:bg-slate-900 dark:focus:ring-slate-700"
+ className="w-full pl-11 pr-4 py-3 rounded-2xl border border-slate-100 bg-white shadow-sm focus:ring-4 focus:ring-indigo-50 outline-none transition-all text-sm font-medium dark:border-slate-800/60 dark:bg-slate-900 dark:focus:ring-slate-700"
  />
  </div>
  <Button
@@ -1752,7 +1808,7 @@ export default function App() {
 
  <Card title="ইউজার ম্যানেজমেন্ট">
  <div className="mb-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
- <div className="p-4 bg-indigo-50 rounded-2xl border border-indigo-100 dark:bg-indigo-500/10">
+ <div className="p-4 bg-indigo-50 rounded-2xl border border-indigo-100 dark:bg-indigo-500/5">
  <p className="text-[10px] text-indigo-400 uppercase font-bold tracking-widest mb-1 dark:text-indigo-300">
  মোট ইউজার
  </p>
@@ -1784,7 +1840,7 @@ export default function App() {
  <div className="hidden md:block overflow-x-auto">
  <table className="w-full text-left">
  <thead>
- <tr className="border-b border-slate-100 italic font-display dark:border-slate-700/50">
+ <tr className="border-b border-slate-100 italic font-display dark:border-slate-800/60">
  <th className="py-5 font-semibold text-slate-400 text-xs uppercase tracking-widest px-4 dark:text-slate-400">
  নাম ও RFID
  </th>
@@ -1862,7 +1918,7 @@ export default function App() {
  setSelectedAdminUser(u);
  setShowHistoryModal(true);
  }}
- className="p-3 bg-indigo-50 text-indigo-600 rounded-2xl hover:bg-indigo-100 transition-colors shadow-sm dark:bg-indigo-500/10 dark:text-indigo-400 dark:hover:bg-indigo-500/30"
+ className="p-3 bg-indigo-50 text-indigo-600 rounded-2xl hover:bg-indigo-100 transition-colors shadow-sm dark:bg-indigo-500/5 dark:text-indigo-400 dark:hover:bg-indigo-500/30"
  title="হিস্টোরি"
  >
  <History className="w-5 h-5" />
@@ -1924,7 +1980,7 @@ export default function App() {
  .map((u) => (
  <div
  key={u.id}
- className="p-4 rounded-[20px] bg-slate-50 border border-slate-100 flex flex-col gap-3 dark:bg-slate-800/80 dark:border-slate-700/50"
+ className="p-4 rounded-[20px] bg-slate-50 border border-slate-100 flex flex-col gap-3 dark:bg-slate-800/40 dark:border-slate-800/60"
  >
  <div className="flex justify-between items-start">
  <div>
@@ -1944,13 +2000,13 @@ export default function App() {
  </p>
  </div>
  </div>
- <div className="grid grid-cols-5 gap-1.5 pt-2 border-t border-slate-200 dark:border-slate-700">
+ <div className="grid grid-cols-5 gap-1.5 pt-2 border-t border-slate-200 dark:border-slate-800">
  <button
  onClick={() => {
  setSelectedAdminUser(u);
  setShowHistoryModal(true);
  }}
- className="flex flex-col items-center gap-1 p-2 bg-white rounded-xl shadow-sm border border-slate-100 text-indigo-600 transition-colors active:bg-slate-50 dark:bg-slate-900 dark:border-slate-700/50 dark:text-indigo-400"
+ className="flex flex-col items-center gap-1 p-2 bg-white rounded-xl shadow-sm border border-slate-100 text-indigo-600 transition-colors active:bg-slate-50 dark:bg-slate-900 dark:border-slate-800/60 dark:text-indigo-400"
  >
  <History className="w-4 h-4" />
  <span className="text-[8px] font-bold uppercase tracking-tighter">
@@ -1959,7 +2015,7 @@ export default function App() {
  </button>
  <button
  onClick={() => handleDirectRecharge(u.id)}
- className="flex flex-col items-center gap-1 p-2 bg-white rounded-xl shadow-sm border border-slate-100 text-emerald-600 transition-colors active:bg-slate-50 dark:bg-slate-900 dark:border-slate-700/50 dark:text-emerald-400"
+ className="flex flex-col items-center gap-1 p-2 bg-white rounded-xl shadow-sm border border-slate-100 text-emerald-600 transition-colors active:bg-slate-50 dark:bg-slate-900 dark:border-slate-800/60 dark:text-emerald-400"
  >
  <Plus className="w-4 h-4" />
  <span className="text-[8px] font-bold uppercase tracking-tighter">
@@ -1968,7 +2024,7 @@ export default function App() {
  </button>
  <button
  onClick={() => handleAdjustBalance(u.id)}
- className="flex flex-col items-center gap-1 p-2 bg-white rounded-xl shadow-sm border border-slate-100 text-amber-600 transition-colors active:bg-slate-50 dark:bg-slate-900 dark:border-slate-700/50 dark:text-amber-400"
+ className="flex flex-col items-center gap-1 p-2 bg-white rounded-xl shadow-sm border border-slate-100 text-amber-600 transition-colors active:bg-slate-50 dark:bg-slate-900 dark:border-slate-800/60 dark:text-amber-400"
  >
  <Wallet className="w-4 h-4" />
  <span className="text-[8px] font-bold uppercase tracking-tighter">
@@ -1977,7 +2033,7 @@ export default function App() {
  </button>
  <button
  onClick={() => handleUpdateRole(u.id, u.role)}
- className="flex flex-col items-center gap-1 p-2 bg-white rounded-xl shadow-sm border border-slate-100 text-slate-600 transition-colors active:bg-slate-50 dark:bg-slate-900 dark:border-slate-700/50 dark:text-slate-300"
+ className="flex flex-col items-center gap-1 p-2 bg-white rounded-xl shadow-sm border border-slate-100 text-slate-600 transition-colors active:bg-slate-50 dark:bg-slate-900 dark:border-slate-800/60 dark:text-slate-300"
  >
  <Settings className="w-4 h-4" />
  <span className="text-[8px] font-bold uppercase tracking-tighter">
@@ -1989,7 +2045,7 @@ export default function App() {
  setEditingUser(u);
  setShowEditUserModal(true);
  }}
- className="flex flex-col items-center gap-1 p-2 bg-white rounded-xl shadow-sm border border-slate-100 text-slate-600 transition-colors active:bg-slate-50 dark:bg-slate-900 dark:border-slate-700/50 dark:text-slate-300"
+ className="flex flex-col items-center gap-1 p-2 bg-white rounded-xl shadow-sm border border-slate-100 text-slate-600 transition-colors active:bg-slate-50 dark:bg-slate-900 dark:border-slate-800/60 dark:text-slate-300"
  >
  <ChevronRight className="w-4 h-4" />
  <span className="text-[8px] font-bold uppercase tracking-tighter">
@@ -2004,7 +2060,7 @@ export default function App() {
  </div>
  ) : (
  <div className="space-y-8">
- <div className="flex justify-between items-center bg-white p-4 rounded-3xl border border-slate-100 shadow-sm dark:bg-slate-900 dark:border-slate-700/50">
+ <div className="flex justify-between items-center bg-white p-4 rounded-3xl border border-slate-100 shadow-sm dark:bg-slate-900 dark:border-slate-800/60">
  <div>
  <h4 className="font-bold text-slate-900 dark:text-white">
  ইনকাম এবং ট্রানজ্যাকশন রিপোর্ট
@@ -2023,7 +2079,7 @@ export default function App() {
 
  {/* 1. Summary Statistics */}
  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
- <Card className="bg-white border-slate-100 p-6 dark:bg-slate-900 dark:border-slate-700/50">
+ <Card className="bg-white border-slate-100 p-6 dark:bg-slate-900 dark:border-slate-800/60">
  <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-2 flex items-center gap-2 dark:text-slate-400">
  <TrendingUp className="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-400" /> মোট
  আদায়কৃত টোল
@@ -2036,7 +2092,7 @@ export default function App() {
  </p>
  </Card>
 
- <Card className="bg-white border-slate-100 p-6 dark:bg-slate-900 dark:border-slate-700/50">
+ <Card className="bg-white border-slate-100 p-6 dark:bg-slate-900 dark:border-slate-800/60">
  <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-2 dark:text-slate-400">
  আজকের ইনকাম
  </p>
@@ -2059,7 +2115,7 @@ export default function App() {
  </p>
  </Card>
 
- <Card className="bg-white border-slate-100 p-6 dark:bg-slate-900 dark:border-slate-700/50">
+ <Card className="bg-white border-slate-100 p-6 dark:bg-slate-900 dark:border-slate-800/60">
  <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-2 dark:text-slate-400">
  মোট রিচার্জ আদায়
  </p>
@@ -2075,7 +2131,7 @@ export default function App() {
  </p>
  </Card>
 
- <Card className="bg-white border-slate-100 p-6 dark:bg-slate-900 dark:border-slate-700/50">
+ <Card className="bg-white border-slate-100 p-6 dark:bg-slate-900 dark:border-slate-800/60">
  <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-2 dark:text-slate-400">
  সর্বোচ্চ ইনকাম প্লাজা
  </p>
@@ -2253,13 +2309,13 @@ export default function App() {
 
  {/* 3. Detailed Filters & List */}
  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
- <Card className="bg-white border-slate-100 flex flex-col gap-2 dark:bg-slate-900 dark:border-slate-700/50">
+ <Card className="bg-white border-slate-100 flex flex-col gap-2 dark:bg-slate-900 dark:border-slate-800/60">
  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest dark:text-slate-400">
  তারিখ ফিল্টার
  </label>
  <input
  type="date"
- className="w-full bg-slate-50 border border-slate-100 rounded-2xl p-4 text-sm font-bold focus:ring-4 focus:ring-indigo-50 outline-none transition-all dark:bg-slate-800/80 dark:border-slate-700/50 dark:focus:ring-slate-700"
+ className="w-full bg-slate-50 border border-slate-100 rounded-2xl p-4 text-sm font-bold focus:ring-4 focus:ring-indigo-50 outline-none transition-all dark:bg-slate-800/40 dark:border-slate-800/60 dark:focus:ring-slate-700"
  value={reportFilter.date}
  onChange={(e) =>
  setReportFilter({
@@ -2270,12 +2326,12 @@ export default function App() {
  />
  </Card>
 
- <Card className="bg-white border-slate-100 flex flex-col gap-2 dark:bg-slate-900 dark:border-slate-700/50">
+ <Card className="bg-white border-slate-100 flex flex-col gap-2 dark:bg-slate-900 dark:border-slate-800/60">
  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest dark:text-slate-400">
  টোল প্লাজা নির্বাচন
  </label>
  <select
- className="w-full bg-slate-50 border border-slate-100 rounded-2xl p-4 text-sm font-bold outline-none appearance-none focus:ring-4 focus:ring-indigo-50 transition-all cursor-pointer dark:bg-slate-800/80 dark:border-slate-700/50 dark:focus:ring-slate-700"
+ className="w-full bg-slate-50 border border-slate-100 rounded-2xl p-4 text-sm font-bold outline-none appearance-none focus:ring-4 focus:ring-indigo-50 transition-all cursor-pointer dark:bg-slate-800/40 dark:border-slate-800/60 dark:focus:ring-slate-700"
  value={reportFilter.plaza}
  onChange={(e) =>
  setReportFilter({
@@ -2313,7 +2369,7 @@ export default function App() {
  <div className="overflow-x-auto">
  <table className="w-full text-left">
  <thead>
- <tr className="border-b border-slate-100 italic font-display dark:border-slate-700/50">
+ <tr className="border-b border-slate-100 italic font-display dark:border-slate-800/60">
  <th className="py-5 font-semibold text-slate-400 text-xs uppercase tracking-widest px-4 dark:text-slate-400">
  ব্যবহারকারী
  </th>
@@ -2418,7 +2474,7 @@ export default function App() {
  onChange={(e) =>
  setNewUser({ ...newUser, name: e.target.value })
  }
- className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-slate-900 outline-none dark:border-slate-700"
+ className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-slate-900 outline-none dark:border-slate-800"
  placeholder="e.g. Abul Kashem"
  required
  />
@@ -2433,7 +2489,7 @@ export default function App() {
  onChange={(e) =>
  setNewUser({ ...newUser, email: e.target.value })
  }
- className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-slate-900 outline-none dark:border-slate-700"
+ className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-slate-900 outline-none dark:border-slate-800"
  placeholder="email@example.com"
  required
  />
@@ -2450,7 +2506,7 @@ export default function App() {
  onChange={(e) =>
  setNewUser({ ...newUser, carNumber: e.target.value })
  }
- className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-slate-900 outline-none dark:border-slate-700"
+ className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-slate-900 outline-none dark:border-slate-800"
  placeholder="DHAKA-METRO-KA-..."
  required
  />
@@ -2464,7 +2520,7 @@ export default function App() {
  onChange={(e) =>
  setNewUser({ ...newUser, carType: e.target.value })
  }
- className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-slate-900 outline-none bg-white dark:border-slate-700 dark:bg-slate-900"
+ className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-slate-900 outline-none bg-white dark:border-slate-800 dark:bg-slate-900"
  >
  <option value="Car">Car (৳৬০)</option>
  <option value="SUV">SUV (৳৮০)</option>
@@ -2484,7 +2540,7 @@ export default function App() {
  onChange={(e) =>
  setNewUser({ ...newUser, rfid: e.target.value })
  }
- className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-slate-900 outline-none dark:border-slate-700"
+ className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-slate-900 outline-none dark:border-slate-800"
  placeholder="Ex: 00112233"
  />
  </div>
@@ -2501,7 +2557,7 @@ export default function App() {
  balance: parseFloat(e.target.value) || 0,
  })
  }
- className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-slate-900 outline-none dark:border-slate-700"
+ className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-slate-900 outline-none dark:border-slate-800"
  placeholder="৳০"
  />
  </div>
@@ -2542,7 +2598,7 @@ export default function App() {
  onChange={(e) =>
  setEditingUser({ ...editingUser, name: e.target.value })
  }
- className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-slate-900 outline-none dark:border-slate-700"
+ className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-slate-900 outline-none dark:border-slate-800"
  required
  />
  </div>
@@ -2556,7 +2612,7 @@ export default function App() {
  onChange={(e) =>
  setEditingUser({ ...editingUser, rfid: e.target.value })
  }
- className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-slate-900 outline-none dark:border-slate-700"
+ className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-slate-900 outline-none dark:border-slate-800"
  />
  </div>
  </div>
@@ -2574,7 +2630,7 @@ export default function App() {
  carNumber: e.target.value,
  })
  }
- className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-slate-900 outline-none dark:border-slate-700"
+ className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-slate-900 outline-none dark:border-slate-800"
  required
  />
  </div>
@@ -2590,7 +2646,7 @@ export default function App() {
  carType: e.target.value as any,
  })
  }
- className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-slate-900 outline-none bg-white dark:border-slate-700 dark:bg-slate-900"
+ className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-slate-900 outline-none bg-white dark:border-slate-800 dark:bg-slate-900"
  >
  <option value="Mini Car">ছোট গাড়ি (৳৬০)</option>
  <option value="SUV">এসইউভি (৳৮০)</option>
