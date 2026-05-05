@@ -382,7 +382,7 @@ export const firebaseService = {
     });
   },
 
-  processToll: async (rfid: string, plazaName: string, amount: number) => {
+  processToll: async (rfid: string, plazaName: string, amountOverride?: number) => {
     const path = 'processToll';
     try {
       // Find the user by RFID first
@@ -403,6 +403,19 @@ export const firebaseService = {
         if (!userDoc.exists()) throw new Error("ইউজার পাওয়া যায়নি");
         
         const userData = userDoc.data() as User;
+        
+        // Calculate amount based on carType if not explicitly overridden
+        let amount = amountOverride || 0;
+        if (!amountOverride) {
+          switch(userData.carType) {
+            case "Motorcycle": amount = 100; break;
+            case "Car/Jeep": amount = 750; break;
+            case "Microbus": amount = 1300; break;
+            case "Bus": amount = 2000; break;
+            default: amount = 750;
+          }
+        }
+
         if (userData.balance < amount) {
           return { success: false, message: 'অপর্যাপ্ত ব্যালেন্স! দয়া করে রিচার্জ করুন।' };
         }
@@ -446,18 +459,16 @@ export const firebaseService = {
     const path = `toll_requests/${requestId}`;
     
     // Determine fee and plaza based on toll_number
-    let amount = 100;
+    let amount = 0;
     let plaza = 'Hardware Gate';
     
     // Make sure it handles both string and number parsing safely
     const tollNum = Number(tollNumber);
-
+    
     if (tollNum === 1) {
        plaza = 'Padma Bridge Toll Plaza';
-       amount = 100;
     } else if (tollNum === 2) {
        plaza = 'Ibrahim (A:) Road';
-       amount = 50;
     }
 
     try {
@@ -485,7 +496,19 @@ export const firebaseService = {
           return;
         }
         
-        const userId = usersSnap.docs[0].id;
+        const userDoc = usersSnap.docs[0];
+        const userData = userDoc.data() as User;
+        const userId = userDoc.id;
+
+        // Set amount based on carType
+        switch(userData.carType) {
+          case "Motorcycle": amount = 100; break;
+          case "Car/Jeep": amount = 750; break;
+          case "Microbus": amount = 1300; break;
+          case "Bus": amount = 2000; break;
+          default: amount = 750; // default for unknown
+        }
+
         const actualUserRef = doc(db, 'users', userId);
         const freshUserDoc = await transaction.get(actualUserRef);
         const freshUserData = freshUserDoc.data() as User;

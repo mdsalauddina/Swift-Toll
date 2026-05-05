@@ -359,7 +359,7 @@ export default function App() {
  email: "",
  password: "",
  carNumber: "",
- carType: "Car",
+ carType: "Car/Jeep",
  balance: 0,
  rfid: "",
  });
@@ -516,7 +516,7 @@ export default function App() {
  email: "",
  password: "",
  carNumber: "",
- carType: "Car",
+ carType: "Car/Jeep",
  balance: 0,
  rfid: "",
  });
@@ -619,11 +619,7 @@ export default function App() {
  // RFID Scan simulation/listener
  const unsubRfid = firebaseService.listenToRfidScans(async (rfid) => {
  console.log("RFID Scanned:", rfid);
- const result = await firebaseService.processToll(
- rfid,
- "RFID টোল গেট",
- 60,
- );
+ const result = await firebaseService.processToll(rfid, "RFID টোল গেট");
  if (result.success) {
  refreshData();
  }
@@ -1057,10 +1053,10 @@ export default function App() {
  className="w-full px-5 py-3 rounded-2xl border border-slate-100 bg-slate-50 focus:bg-white focus:ring-4 focus:ring-indigo-50 outline-none transition-all appearance-none dark:border-slate-800/60 dark:bg-slate-800/40 dark:focus:bg-slate-900 dark:focus:ring-slate-700"
  required
  >
- <option value="Mini Car">ছোট গাড়ি (৳৬০)</option>
- <option value="SUV">এসইউভি (৳৮০)</option>
- <option value="Bus">বাস (৳১৫০)</option>
- <option value="Truck">ট্রাক (৳৩০০)</option>
+ <option value="Motorcycle">মোটর সাইকেল (৳১০০)</option>
+ <option value="Car/Jeep">কার, জীপ (৳৭৫০)</option>
+ <option value="Microbus">মাইক্রোবাস (৳১৩০০)</option>
+ <option value="Bus">বাস (৳২০০০)</option>
  </select>
  </div>
  <div className="sm:col-span-2">
@@ -1294,22 +1290,35 @@ export default function App() {
                   </h3>
                 </div>
 
-                <div className="relative z-10 flex justify-between items-end pt-6 border-t border-slate-100 mt-6 dark:border-slate-800/60">
+                <div className="relative z-10 grid grid-cols-2 gap-y-4 pt-6 border-t border-slate-100 mt-6 dark:border-slate-800/60">
                   <div>
-                    <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold mb-1 dark:text-slate-400">
+                    <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold mb-0.5 dark:text-slate-400">
                       গাড়ি নম্বর
                     </p>
-                    <p className="font-bold tracking-wide text-lg text-slate-900 dark:text-white">
+                    <p className="font-bold tracking-wide text-slate-900 dark:text-white">
                       {user?.carNumber}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold mb-1 dark:text-slate-400">
+                    <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold mb-0.5 dark:text-slate-400">
                       RFID ট্যাগ
                     </p>
                     <p className="font-mono font-bold text-slate-900 dark:text-white">
                       {user?.rfid}
                     </p>
+                  </div>
+                  <div className="col-span-2 pt-1">
+                    <div className="flex justify-between items-center bg-slate-50/50 px-3 py-2 rounded-xl border border-slate-100/50 dark:bg-slate-800/30 dark:border-slate-800/50">
+                      <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold dark:text-slate-400">
+                        গাড়ির ধরন
+                      </p>
+                      <p className="font-bold text-indigo-600 dark:text-indigo-400 text-sm">
+                        {user?.carType === 'Motorcycle' ? 'মোটর সাইকেল' : 
+                         user?.carType === 'Car/Jeep' ? 'কার, জীপ' : 
+                         user?.carType === 'Microbus' ? 'মাইক্রোবাস' : 
+                         user?.carType === 'Bus' ? 'বাস' : user?.carType || 'সাধারণ'}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </Card>
@@ -1891,11 +1900,19 @@ export default function App() {
  <p className="font-mono font-bold text-slate-700 dark:text-slate-200">
  {u.carNumber}
  </p>
- <div className="mt-1">
- <p className="text-xs text-slate-500 font-medium dark:text-slate-400">
- {u.carType}
- </p>
- </div>
+  <div className="mt-1">
+  <p className="text-xs text-slate-500 font-medium dark:text-slate-400">
+  {u.carType === "Motorcycle"
+  ? "মোটর সাইকেল"
+  : u.carType === "Car/Jeep"
+  ? "কার, জীপ"
+  : u.carType === "Microbus"
+  ? "মাইক্রোবাস"
+  : u.carType === "Bus"
+  ? "বাস"
+  : u.carType}
+  </p>
+  </div>
  </td>
  <td className="py-6 px-4">
  <p className="font-display font-bold text-slate-900 text-xl dark:text-white">
@@ -2638,21 +2655,21 @@ export default function App() {
  <label className="block text-sm font-semibold text-slate-700 mb-1 dark:text-slate-200">
  গাড়ির ধরন
  </label>
- <select
- value={editingUser.carType}
- onChange={(e) =>
- setEditingUser({
- ...editingUser,
- carType: e.target.value as any,
- })
- }
- className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-slate-900 outline-none bg-white dark:border-slate-800 dark:bg-slate-900"
- >
- <option value="Mini Car">ছোট গাড়ি (৳৬০)</option>
- <option value="SUV">এসইউভি (৳৮০)</option>
- <option value="Bus">বাস (৳১৫০)</option>
- <option value="Truck">ট্রাক (৳৩০০)</option>
- </select>
+                      <select
+                        value={editingUser.carType}
+                        onChange={(e) =>
+                          setEditingUser({
+                            ...editingUser,
+                            carType: e.target.value as any,
+                          })
+                        }
+                        className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-slate-900 outline-none bg-white dark:border-slate-800 dark:bg-slate-900"
+                      >
+                        <option value="Motorcycle">মোটর সাইকেল (৳১০০)</option>
+                        <option value="Car/Jeep">কার, জীপ (৳৭৫০)</option>
+                        <option value="Microbus">মাইক্রোবাস (৳১৩০০)</option>
+                        <option value="Bus">বাস (৳২০০০)</option>
+                      </select>
  </div>
  </div>
  <div className="pt-4 flex gap-3">
