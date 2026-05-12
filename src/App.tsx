@@ -60,24 +60,47 @@ import {
 // --- UI Components ---
 
 const Card = ({
- children,
- className = "",
- id,
- title,
+  children,
+  className = "",
+  id,
+  title,
+  subtitle,
+  icon: Icon,
 }: {
- children: React.ReactNode;
- className?: string;
- id?: string;
- title?: string;
+  children: React.ReactNode;
+  className?: string;
+  id?: string;
+  title?: string;
+  subtitle?: string;
+  icon?: any;
 }) => (
- <div id={id} className={`premium-card p-5 sm:p-8 dark:border-slate-800/50 ${className}`}>
- {title && (
- <h4 className="font-display font-bold text-slate-900 mb-6 tracking-tight text-lg sm:text-xl dark:text-white">
- {title}
- </h4>
- )}
- {children}
- </div>
+  <div
+    id={id}
+    className={`premium-card relative group p-5 sm:p-7 dark:bg-slate-900/40 dark:backdrop-blur-md ${className}`}
+  >
+    {(title || Icon) && (
+      <div className="flex items-center justify-between mb-6 shrink-0">
+        <div>
+          {title && (
+            <h4 className="font-display font-bold text-slate-900 tracking-tight text-lg sm:text-xl dark:text-white">
+              {title}
+            </h4>
+          )}
+          {subtitle && (
+            <p className="text-xs text-slate-400 mt-0.5 font-medium dark:text-slate-500">
+              {subtitle}
+            </p>
+          )}
+        </div>
+        {Icon && (
+          <div className="p-2.5 bg-slate-50 rounded-2xl dark:bg-slate-800/50 dark:border dark:border-slate-800/80 group-hover:scale-110 transition-transform duration-300">
+            <Icon className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+          </div>
+        )}
+      </div>
+    )}
+    {children}
+  </div>
 );
 
 const Button = ({
@@ -91,13 +114,15 @@ const Button = ({
  type = "button",
 }: any) => {
  const variants: any = {
- primary:
- "bg-slate-900 dark:bg-indigo-600 text-white hover:bg-slate-800 dark:hover:bg-indigo-500 shadow-xl shadow-slate-200 dark:shadow-none",
- secondary: "bg-indigo-50 text-indigo-700 hover:bg-indigo-100",
- outline:
- "border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:bg-slate-800 hover:border-slate-300",
- ghost: "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:bg-slate-800/50",
- };
+    primary:
+      "bg-slate-900 dark:bg-indigo-600 text-white hover:bg-slate-800 dark:hover:bg-indigo-500 shadow-xl shadow-slate-200 dark:shadow-none glow-indigo",
+    secondary:
+      "bg-indigo-50 text-indigo-700 hover:bg-indigo-100 dark:bg-indigo-500/10 dark:text-indigo-400 dark:hover:bg-indigo-500/20",
+    outline:
+      "border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-700",
+    ghost:
+      "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:bg-slate-800/50",
+  };
  return (
  <button
  id={id}
@@ -226,25 +251,31 @@ const UserHistoryView = ({
  }, [userId]);
 
  return (
- <div className="space-y-6">
- <div className="grid grid-cols-2 gap-4">
- <div className="bg-indigo-50 p-4 rounded-2xl border border-indigo-100 dark:bg-indigo-500/5">
- <p className="text-[10px] text-indigo-400 uppercase font-bold tracking-widest mb-1 dark:text-indigo-300">
- মোট ভ্রমণ
- </p>
- <p className="text-xl font-display font-bold text-indigo-900 dark:text-indigo-100">
- {travels.length} বার
- </p>
- </div>
- <div className="bg-emerald-50 p-4 rounded-2xl border border-emerald-100 dark:bg-emerald-500/10">
- <p className="text-[10px] text-emerald-400 uppercase font-bold tracking-widest mb-1">
- মোট ব্যয়
- </p>
- <p className="text-xl font-display font-bold text-emerald-900">
- ৳{travels.reduce((acc, t) => acc + t.amount, 0).toLocaleString()}
- </p>
- </div>
- </div>
+    <div className="space-y-6">
+      <div className="grid grid-cols-2 gap-4">
+        <div className="p-4 rounded-2xl border border-indigo-100 bg-gradient-to-br from-indigo-50/50 to-white dark:from-indigo-500/10 dark:to-transparent dark:border-indigo-500/20">
+          <div className="flex justify-between items-start mb-2">
+            <p className="text-[10px] text-indigo-400 uppercase font-bold tracking-widest dark:text-indigo-300">
+              মোট ভ্রমণ
+            </p>
+            <History className="w-3.5 h-3.5 text-indigo-400" />
+          </div>
+          <p className="text-xl font-display font-bold text-indigo-900 dark:text-indigo-100">
+            {travels.length} <span className="text-sm font-sans font-medium text-slate-400">বার</span>
+          </p>
+        </div>
+        <div className="p-4 rounded-2xl border border-emerald-100 bg-gradient-to-br from-emerald-50/50 to-white dark:from-emerald-500/10 dark:to-transparent dark:border-emerald-500/20">
+          <div className="flex justify-between items-start mb-2">
+            <p className="text-[10px] text-emerald-400 uppercase font-bold tracking-widest">
+              মোট ব্যয়
+            </p>
+            <TrendingUp className="w-3.5 h-3.5 text-emerald-400" />
+          </div>
+          <p className="text-xl font-display font-bold text-emerald-900 dark:text-white">
+            ৳{travels.reduce((acc, t) => acc + t.amount, 0).toLocaleString()}
+          </p>
+        </div>
+      </div>
 
  <div className="space-y-4">
  <h4 className="font-bold text-slate-900 flex items-center gap-2 dark:text-white">
@@ -387,9 +418,18 @@ export default function App() {
  const handleEditUser = async (e: React.FormEvent) => {
  e.preventDefault();
  if (!editingUser) return;
+ setIsLoading(true);
+ try {
  await firebaseService.updateUser(editingUser);
  setShowEditUserModal(false);
  refreshData();
+ alert("ইউজার তথ্য সফলভাবে আপডেট করা হয়েছে।");
+ } catch (err: any) {
+ console.error("Update error:", err);
+ alert(err.message || "আপডেট করতে সমস্যা হয়েছে।");
+ } finally {
+ setIsLoading(false);
+ }
  };
 
  const handleDeleteUser = async (userId: string) => {
@@ -509,6 +549,8 @@ export default function App() {
 
  const handleCreateUser = async (e: React.FormEvent) => {
  e.preventDefault();
+ setIsLoading(true);
+ try {
  await firebaseService.addUser(newUser);
  setShowAddUserModal(false);
  setNewUser({
@@ -521,6 +563,13 @@ export default function App() {
  rfid: "",
  });
  refreshData();
+ alert("নতুন ইউজার সফলভাবে নিবন্ধিত হয়েছে।");
+ } catch (err: any) {
+ console.error("Create error:", err);
+ alert(err.message || "রেজিস্ট্রেশন করতে সমস্যা হয়েছে।");
+ } finally {
+ setIsLoading(false);
+ }
  };
 
  
@@ -1228,7 +1277,7 @@ export default function App() {
                     notifications.map((notif) => (
                       <div
                         key={notif.id}
-                        className={`p-3 rounded-xl mb-1 ${notif.read ? "opacity-75" : "bg-indigo-50/50 dark:bg-indigo-500/5"}`}
+                        className={`p-3 rounded-xl mb-1 transition-all hover:bg-slate-50 dark:hover:bg-slate-800 ${notif.read ? "opacity-60" : "bg-indigo-50/50 dark:bg-indigo-500/5 border-l-2 border-indigo-500"}`}
                       >
                         <p className="text-sm font-medium text-slate-900 dark:text-white">{notif.title}</p>
                         <p className="text-xs text-slate-500 mt-1 dark:text-slate-400">{notif.message}</p>
@@ -1254,7 +1303,7 @@ export default function App() {
       </div>
     </header>
 
-    <main className="max-w-6xl mx-auto px-4 sm:px-6 pt-4 sm:pt-6 pb-20 dark:bg-slate-950 transition-colors duration-500">
+    <main className="max-w-6xl mx-auto px-4 sm:px-6 pt-4 sm:pt-10 pb-24 transition-colors duration-500">
       {viewMode === "user" ? (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8">
           <div className="lg:col-span-4 space-y-6">
@@ -1262,62 +1311,54 @@ export default function App() {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
             >
-              <Card
-                id="balance-card"
-                className="bg-white border-2 border-slate-200 overflow-hidden relative min-h-[240px] flex flex-col justify-between shadow-xl dark:bg-slate-900/80 dark:border-slate-800 dark:shadow-none dark:backdrop-blur-sm"
+              <Card 
+                id="balance-card" 
+                className="bg-gradient-to-br from-indigo-600 to-indigo-800 dark:from-indigo-600 dark:to-indigo-900 !p-0 overflow-hidden border-none shadow-[0_20px_50px_-20px_rgba(79,70,229,0.5)] dark:shadow-[0_20px_50px_-20px_rgba(79,70,229,0.3)] min-h-[220px]"
               >
-                <div className="absolute top-[-20%] right-[-10%] w-64 h-64 bg-indigo-50 rounded-full blur-3xl dark:bg-indigo-500/5" />
-                <div className="absolute bottom-[-10%] left-[-10%] w-48 h-48 bg-emerald-50 rounded-full blur-3xl dark:bg-emerald-500/10" />
+                <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full -mr-20 -mt-20 blur-2xl" />
+                <div className="absolute bottom-0 left-0 w-32 h-32 bg-indigo-400/20 rounded-full -ml-16 -mb-16 blur-xl" />
                 
-                <div className="relative z-10 flex justify-between items-start mb-8">
-                  <div className="flex items-center gap-2">
-                    <Wallet className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
-                    <span className="text-sm font-bold text-indigo-600 uppercase tracking-widest dark:text-indigo-400">ব্যালেন্স</span>
+                <div className="relative z-10 p-6 flex flex-col h-full justify-between h-[220px]">
+                  <div className="flex justify-between items-start">
+                    <div className="flex flex-col">
+                      <span className="text-indigo-100/60 text-[10px] font-bold uppercase tracking-[0.2em] mb-1">ডিজিটাল টোল কার্ড</span>
+                      <div className="flex items-center gap-2">
+                         <div className="w-8 h-6 bg-gradient-to-br from-amber-300 to-amber-500 rounded-md shadow-inner" />
+                         <span className="text-white font-display font-bold">SMART PASS</span>
+                      </div>
+                    </div>
+                    <div className="flex -space-x-2">
+                       <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md border border-white/10 flex items-center justify-center">
+                          <Car className="w-4 h-4 text-white" />
+                       </div>
+                    </div>
                   </div>
-                  <div className="flex gap-1">
-                    <div className="w-8 h-5 bg-slate-100 rounded border border-slate-200 dark:bg-slate-800/50 dark:border-slate-800" />
-                    <div className="w-4 h-4 rounded-full bg-slate-100 dark:bg-slate-800/50" />
-                  </div>
-                </div>
 
-                <div className="relative z-10">
-                  <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-1 dark:text-slate-400">
-                    বর্তমান ব্যালেন্স
-                  </p>
-                  <h3 className="text-5xl font-display font-bold tracking-tight text-slate-900 flex items-baseline gap-2 dark:text-white">
-                    <span className="text-2xl text-indigo-600 font-sans opacity-50 dark:text-indigo-400">৳</span>
-                    {user?.balance.toLocaleString("en-IN")}
-                  </h3>
-                </div>
+                  <div className="mt-4">
+                    <span className="text-indigo-100/50 text-[10px] font-bold uppercase tracking-widest">বর্তমান ব্যালেন্স</span>
+                    <h3 className="text-4xl font-display font-bold text-white flex items-baseline gap-1 mt-1">
+                      <span className="text-xl opacity-60">৳</span>
+                      {user?.balance.toLocaleString("en-IN")}
+                    </h3>
+                  </div>
 
-                <div className="relative z-10 grid grid-cols-2 gap-y-4 pt-6 border-t border-slate-100 mt-6 dark:border-slate-800/60">
-                  <div>
-                    <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold mb-0.5 dark:text-slate-400">
-                      গাড়ি নম্বর
-                    </p>
-                    <p className="font-bold tracking-wide text-slate-900 dark:text-white">
-                      {user?.carNumber}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold mb-0.5 dark:text-slate-400">
-                      RFID ট্যাগ
-                    </p>
-                    <p className="font-mono font-bold text-slate-900 dark:text-white">
-                      {user?.rfid}
-                    </p>
-                  </div>
-                  <div className="col-span-2 pt-1">
-                    <div className="flex justify-between items-center bg-slate-50/50 px-3 py-2 rounded-xl border border-slate-100/50 dark:bg-slate-800/30 dark:border-slate-800/50">
-                      <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold dark:text-slate-400">
-                        গাড়ির ধরন
-                      </p>
-                      <p className="font-bold text-indigo-600 dark:text-indigo-400 text-sm">
+                  <div className="mt-6 grid grid-cols-2 gap-4 border-t border-white/10 pt-4">
+                    <div>
+                       <p className="text-[8px] text-indigo-100/40 uppercase font-black tracking-tighter">গাড়ি নম্বর</p>
+                       <p className="text-xs font-bold text-white tracking-widest">{user?.carNumber}</p>
+                    </div>
+                    <div className="text-right">
+                       <p className="text-[8px] text-indigo-100/40 uppercase font-black tracking-tighter">RFID ট্যাগ</p>
+                       <p className="text-[10px] font-mono font-bold text-white/90">{user?.rfid}</p>
+                    </div>
+                    <div className="col-span-2 flex justify-between items-center py-1.5 px-3 bg-white/10 rounded-lg backdrop-blur-sm">
+                       <p className="text-[8px] text-indigo-100/60 uppercase font-black tracking-tighter">গাড়ির ধরন</p>
+                       <p className="text-[10px] font-bold text-indigo-200">
                         {user?.carType === 'Motorcycle' ? 'মোটর সাইকেল' : 
                          user?.carType === 'Car/Jeep' ? 'কার, জীপ' : 
                          user?.carType === 'Microbus' ? 'মাইক্রোবাস' : 
                          user?.carType === 'Bus' ? 'বাস' : user?.carType || 'সাধারণ'}
-                      </p>
+                       </p>
                     </div>
                   </div>
                 </div>
@@ -2096,78 +2137,39 @@ export default function App() {
 
  {/* 1. Summary Statistics */}
  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
- <Card className="bg-white border-slate-100 p-6 dark:bg-slate-900 dark:border-slate-800/60">
- <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-2 flex items-center gap-2 dark:text-slate-400">
- <TrendingUp className="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-400" /> মোট
- আদায়কৃত টোল
- </p>
- <h3 className="text-3xl font-display font-bold text-slate-900 dark:text-white">
- ৳{calculateTotalIncome().toLocaleString()}
- </h3>
- <p className="text-[10px] text-slate-500 font-bold mt-2 flex items-center gap-1 dark:text-slate-400">
- আজ পর্যন্ত সর্বমোট সংগ্রহ
- </p>
- </Card>
+ <Card icon={TrendingUp} title="মোট আদায়কৃত টোল" subtitle="আজ পর্যন্ত সর্বমোট সংগ্রহ" className="dark:bg-indigo-500/5 dark:border-indigo-500/10 transition-transform hover:scale-[1.02]">
+  <h3 className="text-3xl font-display font-bold text-slate-900 dark:text-white mt-1">
+    ৳{calculateTotalIncome().toLocaleString()}
+  </h3>
+</Card>
 
- <Card className="bg-white border-slate-100 p-6 dark:bg-slate-900 dark:border-slate-800/60">
- <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-2 dark:text-slate-400">
- আজকের ইনকাম
- </p>
- <h3 className="text-3xl font-display font-bold text-slate-900 dark:text-white">
- ৳
- {allTravelHistory
- .filter((t) =>
- isSameDay(parseISO(t.timestamp), new Date()),
- )
- .reduce((acc, t) => acc + t.amount, 0)
- .toLocaleString()}
- </h3>
- <p className="text-[10px] text-indigo-500 font-bold mt-2 dark:text-indigo-400">
- {
- allTravelHistory.filter((t) =>
- isSameDay(parseISO(t.timestamp), new Date()),
- ).length
- }{" "}
- টি ট্রানজ্যাকশন
- </p>
- </Card>
+ <Card icon={Clock} title="আজকের ইনকাম" subtitle="আজকের মোট কালেকশন" className="dark:bg-emerald-500/5 dark:border-emerald-500/10 transition-transform hover:scale-[1.02]">
+    <h3 className="text-3xl font-display font-bold text-slate-900 dark:text-white mt-1">
+      ৳{allTravelHistory.filter((t) => isSameDay(parseISO(t.timestamp), new Date())).reduce((acc, t) => acc + t.amount, 0).toLocaleString()}
+    </h3>
+    <p className="text-[10px] text-emerald-500 font-bold mt-2 flex items-center gap-1">
+      <CheckCircle2 className="w-3 h-3" /> {allTravelHistory.filter((t) => isSameDay(parseISO(t.timestamp), new Date())).length} টি ট্রানজ্যাকশন
+    </p>
+</Card>
 
- <Card className="bg-white border-slate-100 p-6 dark:bg-slate-900 dark:border-slate-800/60">
- <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-2 dark:text-slate-400">
- মোট রিচার্জ আদায়
- </p>
- <h3 className="text-3xl font-display font-bold text-slate-900 dark:text-white">
- ৳
- {adminRequests
- .filter((r) => r.status === "completed")
- .reduce((acc, r) => acc + r.amount, 0)
- .toLocaleString()}
- </h3>
- <p className="text-[10px] text-indigo-500 font-bold mt-2 dark:text-indigo-400">
- রিচার্জ ও অ্যাডজাস্টমেন্ট
- </p>
- </Card>
+ <Card icon={Wallet} title="মোট রিচার্জ আদায়" subtitle="বুটস্ট্র্যাপ ও রিচার্জ ফান্ড" className="dark:bg-amber-500/5 dark:border-amber-500/10 transition-transform hover:scale-[1.02]">
+    <h3 className="text-3xl font-display font-bold text-slate-900 dark:text-white mt-1">
+      ৳{adminRequests.filter((r) => r.status === "completed").reduce((acc, r) => acc + r.amount, 0).toLocaleString()}
+    </h3>
+</Card>
 
- <Card className="bg-white border-slate-100 p-6 dark:bg-slate-900 dark:border-slate-800/60">
- <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-2 dark:text-slate-400">
- সর্বোচ্চ ইনকাম প্লাজা
- </p>
- <h3 className="text-xl font-bold text-slate-900 truncate dark:text-white">
- {allTravelHistory.length > 0
- ? Object.entries(
- allTravelHistory.reduce((acc: any, t) => {
- acc[t.plazaName] =
- (acc[t.plazaName] || 0) + t.amount;
- return acc;
- }, {}),
- ).sort((a: any, b: any) => b[1] - a[1])[0]?.[0] ||
- "N/A"
- : "---"}
- </h3>
- <p className="text-[10px] text-emerald-500 font-bold mt-2 dark:text-emerald-400">
- সবচেয়ে জনপ্রিয়
- </p>
- </Card>
+ <Card icon={MapPin} title="সর্বোচ্চ ইনকাম প্লাজা" subtitle="সবচেয়ে জনপ্রিয় গেট" className="dark:bg-indigo-500/5 dark:border-indigo-500/10 transition-transform hover:scale-[1.02]">
+    <h3 className="text-xl font-bold text-slate-900 truncate dark:text-white mt-1">
+      {allTravelHistory.length > 0
+        ? Object.entries(
+            allTravelHistory.reduce((acc: any, t) => {
+              acc[t.plazaName] = (acc[t.plazaName] || 0) + t.amount;
+              return acc;
+            }, {}),
+          ).sort((a: any, b: any) => b[1] - a[1])[0]?.[0] || "N/A"
+        : "---"}
+    </h3>
+</Card>
  </div>
 
  {/* 2. Charts Section */}

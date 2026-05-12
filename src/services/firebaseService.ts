@@ -152,8 +152,26 @@ export const firebaseService = {
     const path = `users/${user.id}`;
     try {
       const userRef = doc(db, 'users', user.id);
-      await updateDoc(userRef, { ...user });
-    } catch (error) {
+      const cleanUser = {
+        ...user,
+        rfid: user.rfid?.trim() || ""
+      };
+
+      // Check if RFID is already taken by another user
+      if (cleanUser.rfid) {
+        const q = query(collection(db, 'users'), where('rfid', '==', cleanUser.rfid));
+        const snap = await getDocs(q);
+        const duplicate = snap.docs.find(d => d.id !== user.id);
+        if (duplicate) {
+          throw new Error(`এই RFID (${cleanUser.rfid}) কার্ডটি ইতিপূর্বে "${duplicate.data().name}" এর প্রোফাইলে নিবন্ধিত আছে। দয়া করে অন্য কার্ড ব্যবহার করুন।`);
+        }
+      }
+
+      await updateDoc(userRef, cleanUser);
+    } catch (error: any) {
+      if (error.message.includes('নিবন্ধিত আছে')) {
+        throw error;
+      }
       handleFirestoreError(error, OperationType.UPDATE, path);
     }
   },
@@ -161,13 +179,29 @@ export const firebaseService = {
   addUser: async (userData: Omit<User, 'id'>) => {
     const path = 'users';
     try {
+      const cleanRfid = userData.rfid?.trim() || "";
+      
+      // Check for duplicate RFID before adding
+      if (cleanRfid) {
+        const q = query(collection(db, 'users'), where('rfid', '==', cleanRfid));
+        const snap = await getDocs(q);
+        if (!snap.empty) {
+          const duplicate = snap.docs[0].data();
+          throw new Error(`এই RFID (${cleanRfid}) কার্ডটি ইতিপূর্বে "${duplicate.name}" এর প্রোফাইলে নিবন্ধিত আছে।`);
+        }
+      }
+
       const docRef = await addDoc(collection(db, 'users'), {
         ...userData,
+        rfid: cleanRfid,
         role: userData.role || 'user',
         createdAt: serverTimestamp()
       });
-      return { id: docRef.id, ...userData } as User;
-    } catch (error) {
+      return { id: docRef.id, ...userData, rfid: cleanRfid } as User;
+    } catch (error: any) {
+      if (error.message.includes('নিবন্ধিত আছে')) {
+        throw error;
+      }
       handleFirestoreError(error, OperationType.CREATE, path);
     }
   },
@@ -385,12 +419,13 @@ export const firebaseService = {
   processToll: async (rfid: string, plazaName: string, amountOverride?: number) => {
     const path = 'processToll';
     try {
+      const cleanRfid = rfid.trim();
       // Find the user by RFID first
-      const usersQ = query(collection(db, 'users'), where('rfid', '==', rfid));
+      const usersQ = query(collection(db, 'users'), where('rfid', '==', cleanRfid));
       const userSnapshot = await getDocs(usersQ);
       
       if (userSnapshot.empty) {
-        return { success: false, message: 'এই RFID কার্ডটি নিবন্ধিত নয়।' };
+        return { success: false, message: `এই RFID কার্ডটি (${cleanRfid}) নিবন্ধিত নয়।` };
       }
       
       const userDocInitial = userSnapshot.docs[0];
@@ -472,6 +507,7 @@ export const firebaseService = {
     }
 
     try {
+      const cleanRfid = rfid.trim();
       await runTransaction(db, async (transaction) => {
         const tollRequestRef = doc(db, 'toll_requests', requestId);
         const reqDoc = await transaction.get(tollRequestRef);
@@ -480,19 +516,19 @@ export const firebaseService = {
         const gateControlRef = doc(db, 'gate_control', 'status');
         
         // Find user by RFID field
-        const usersQ = query(collection(db, 'users'), where('rfid', '==', rfid));
+        const usersQ = query(collection(db, 'users'), where('rfid', '==', cleanRfid));
         const usersSnap = await getDocs(usersQ);
         
         if (usersSnap.empty) {
           transaction.set(gateControlRef, { 
             state: "fail", 
             message: "Invalid RFID!",
-            lastRfid: rfid,
+            lastRfid: cleanRfid,
             lastReqId: requestId,
             tollNumber: tollNumber,
             timestamp: new Date().toISOString()
           });
-          transaction.update(tollRequestRef, { status: "fail", message: "Invalid RFID!" });
+          transaction.update(tollRequestRef, { status: "fail", message: `Invalid RFID! (${cleanRfid})` });
           return;
         }
         
