@@ -27,6 +27,10 @@ import {
  Sun,
  Moon,
  AlertTriangle,
+  Shield,
+  Mail,
+  Phone,
+  Calendar,
 } from "lucide-react";
 import {
  BarChart,
@@ -66,6 +70,7 @@ const Card = ({
   title,
   subtitle,
   icon: Icon,
+  onClick,
 }: {
   children: React.ReactNode;
   className?: string;
@@ -73,70 +78,70 @@ const Card = ({
   title?: string;
   subtitle?: string;
   icon?: any;
+  onClick?: () => void;
 }) => (
   <div
     id={id}
-    className={`premium-card relative group p-5 sm:p-7 dark:bg-slate-900/40 dark:backdrop-blur-md ${className}`}
+    onClick={onClick}
+    className={`glass-card relative group p-6 ${className} ${onClick ? "cursor-pointer active:scale-[0.99]" : ""}`}
   >
     {(title || Icon) && (
       <div className="flex items-center justify-between mb-6 shrink-0">
         <div>
           {title && (
-            <h4 className="font-display font-bold text-slate-900 tracking-tight text-lg sm:text-xl dark:text-white">
+            <h4 className="font-display font-bold text-slate-900 dark:text-white tracking-tight text-lg">
               {title}
             </h4>
           )}
           {subtitle && (
-            <p className="text-xs text-slate-400 mt-0.5 font-medium dark:text-slate-500">
+            <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest mt-1">
               {subtitle}
             </p>
           )}
         </div>
         {Icon && (
-          <div className="p-2.5 bg-slate-50 rounded-2xl dark:bg-slate-800/50 dark:border dark:border-slate-800/80 group-hover:scale-110 transition-transform duration-300">
-            <Icon className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+          <div className="p-2.5 bg-indigo-500/10 rounded-xl border border-indigo-500/10 text-indigo-400">
+            <Icon className="w-5 h-5" />
           </div>
         )}
       </div>
     )}
-    {children}
+    <div className="relative z-10">{children}</div>
   </div>
 );
 
 const Button = ({
- children,
- onClick,
- variant = "primary",
- className = "",
- id,
- disabled,
- icon: Icon,
- type = "button",
+  children,
+  onClick,
+  variant = "primary",
+  className = "",
+  id,
+  disabled,
+  icon: Icon,
+  type = "button",
 }: any) => {
- const variants: any = {
+  const variants: any = {
     primary:
-      "bg-slate-900 dark:bg-indigo-600 text-white hover:bg-slate-800 dark:hover:bg-indigo-500 shadow-xl shadow-slate-200 dark:shadow-none glow-indigo",
-    secondary:
-      "bg-indigo-50 text-indigo-700 hover:bg-indigo-100 dark:bg-indigo-500/10 dark:text-indigo-400 dark:hover:bg-indigo-500/20",
-    outline:
-      "border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-700",
+      "bg-indigo-600 text-white hover:bg-indigo-500 shadow-lg shadow-indigo-500/20 dark:shadow-indigo-900/40 border border-indigo-400/20",
+    secondary: "bg-slate-100 text-slate-900 hover:bg-slate-200 border border-slate-200 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10 dark:border-white/10",
+    outline: "border border-slate-200 text-slate-500 hover:text-slate-900 hover:bg-slate-50 dark:border-white/10 dark:text-slate-400 dark:hover:text-white dark:hover:bg-white/5 transition-all",
     ghost:
-      "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:bg-slate-800/50",
+      "text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/5 transition-all text-xs font-semibold uppercase tracking-wider",
   };
- return (
- <button
- id={id}
- type={type}
- onClick={onClick}
- disabled={disabled}
- className={`relative min-h-[48px] flex items-center justify-center gap-2.5 px-6 py-3 sm:py-4 rounded-[20px] font-bold transition-all active:scale-95 disabled:opacity-50 disabled:active:scale-100 group ${variants[variant]} ${className}`}
- >
- {Icon && (
- <Icon className="w-5 h-5 transition-transform group-hover:scale-110" />
- )}
- <span className="whitespace-nowrap">{children}</span>
- </button>
- );
+  return (
+    <button
+      id={id}
+      type={type}
+      onClick={onClick}
+      disabled={disabled}
+      className={`relative flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all active:scale-[0.98] disabled:opacity-40 disabled:active:scale-100 group overflow-hidden ${variants[variant]} ${className}`}
+    >
+      {Icon && (
+        <Icon className="w-4 h-4 transition-transform group-hover:scale-110" />
+      )}
+      <span className="relative z-10 whitespace-nowrap">{children}</span>
+    </button>
+  );
 };
 
 const Badge = ({
@@ -1179,31 +1184,34 @@ export default function App() {
  }
 
  return (
- <div className="min-h-[100dvh] bg-[#F9FAFB] font-sans pb-24 sm:pb-20 pt-2 sm:pt-0 dark:bg-slate-950">
+     <div className="min-h-screen selection:bg-indigo-500/30 selection:text-indigo-200 overflow-x-hidden">
+      <div className="mesh-gradient" />
+      <div className="fixed inset-0 bg-slate-900/10 dark:bg-[#030408]/40 pointer-events-none" />
+      <div className="scan-line pointer-events-none opacity-[0.03]" />
  {/* Header */}
  <header className="glass-morphism sticky top-0 z-40 px-4 sm:px-6 py-3 sm:py-4 mb-6 sm:mb-8">
  <div className="max-w-6xl mx-auto flex justify-between items-center gap-2">
- <div className="flex items-center gap-3">
- <motion.div
- whileHover={{ rotate: 5 }}
- className="w-10 h-10 sm:w-12 sm:h-12 shrink-0 bg-slate-900 rounded-2xl flex items-center justify-center shadow-lg shadow-slate-200 overflow-hidden dark:bg-indigo-500 dark:shadow-slate-900/50"
- >
- <img
- src="https://i.postimg.cc/L5ZtB5vr/1777431738491-2.jpg"
- alt="Logo"
- className="w-full h-full object-cover"
- />
- </motion.div>
- <div className="hidden lg:block shrink-0">
- <h2 className="font-display font-bold text-slate-900 leading-tight text-xl tracking-tight dark:text-white">
- SwiftToll
- </h2>
- <p className="text-slate-400 text-[10px] uppercase tracking-widest font-bold dark:text-slate-400">
- Smart Expressway
- </p>
- </div>
-
-        </div>
+ <div className="flex items-center gap-3 cursor-pointer group" onClick={() => { setViewMode("user"); setActiveTab("travel"); }}>
+                  <motion.div
+                    whileHover={{ rotate: 5, scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="w-10 h-10 sm:w-12 sm:h-12 shrink-0 bg-slate-900 rounded-2xl flex items-center justify-center shadow-lg shadow-slate-200 overflow-hidden dark:bg-indigo-500 dark:shadow-slate-900/50"
+                  >
+                    <img
+                      src="https://i.postimg.cc/L5ZtB5vr/1777431738491-2.jpg"
+                      alt="Logo"
+                      className="w-full h-full object-cover group-hover:opacity-90 transition-opacity"
+                    />
+                  </motion.div>
+                  <div className="hidden lg:block shrink-0">
+                    <h2 className="text-xl font-display font-bold text-slate-900 dark:text-white tracking-tight leading-none uppercase group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                      SWIFT <span className="text-indigo-500">TOLL</span>
+                    </h2>
+                    <p className="text-slate-500 text-[10px] uppercase tracking-widest font-bold dark:text-slate-400">
+                      Smart Expressway
+                    </p>
+                  </div>
+                </div>
 
         {user?.role === "admin" && (
           <div className="flex bg-slate-100 p-1 rounded-[16px] border border-slate-200 dark:bg-slate-800/50 dark:border-slate-800">
@@ -1234,6 +1242,14 @@ export default function App() {
               </p>
             </div>
           </div>
+
+          <button
+            onClick={() => { setViewMode("user"); setActiveTab("profile"); }}
+            className={`relative w-10 h-10 sm:w-11 sm:h-11 rounded-[16px] transition-all shrink-0 mr-2 flex items-center justify-center border ${activeTab === "profile" && viewMode === "user" ? "bg-indigo-50 border-indigo-200 text-indigo-600 dark:bg-indigo-500/20 dark:border-indigo-500/30 dark:text-indigo-400" : "bg-slate-50 hover:bg-slate-100 border-slate-100 text-slate-600 dark:text-slate-400 dark:bg-slate-800 dark:hover:bg-slate-700 dark:border-slate-800/60"}`}
+            title="প্রোফাইল"
+          >
+            <UserIcon className="w-5 h-5" />
+          </button>
 
           <button
             onClick={() => setIsDarkMode(!isDarkMode)}
@@ -1303,8 +1319,143 @@ export default function App() {
       </div>
     </header>
 
-    <main className="max-w-6xl mx-auto px-4 sm:px-6 pt-4 sm:pt-10 pb-24 transition-colors duration-500">
-      {viewMode === "user" ? (
+    <main className="max-w-6xl mx-auto px-4 sm:px-6 pt-8 sm:pt-16 pb-32 relative z-10">
+      <AnimatePresence mode="wait">
+{!viewMode ? (
+<motion.div
+            key="landing"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="flex flex-col items-center justify-center min-h-[75vh] text-center px-4"
+          >
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-500/5 border border-indigo-500/10 mb-10 shadow-inner"
+            >
+              <div className="relative">
+                <div className="w-2 h-2 rounded-full bg-indigo-500 animate-ping absolute inset-0" />
+                <div className="w-2 h-2 rounded-full bg-indigo-500 relative" />
+              </div>
+              <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-[0.3em]">Institutional Protocol Active</span>
+            </motion.div>
+            
+            <h1 className="text-6xl sm:text-[100px] font-display font-black text-slate-900 dark:text-white tracking-tighter mb-8 mt-2 leading-[0.95]">
+              SWIFT <span className="text-indigo-500">TOLL</span>
+            </h1>
+            
+            <p className="text-slate-400 max-w-xl mx-auto mb-16 text-lg font-medium opacity-60 leading-relaxed">
+              Precision toll management systems for modern infrastructure. <br className="hidden sm:block" /> Secure, scalable, and fully automated.
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10 w-full max-w-4xl">
+              <Card onClick={() => setViewMode("user")} icon={UserIcon} title="Operator Access" subtitle="Manage Digital Assets" className="p-10 border-white/5 hover:border-indigo-500/20 group/card transition-all duration-500">
+                <p className="text-slate-500 dark:text-slate-400 mb-10 text-sm font-medium">Verified node authentication for highway operators and vehicle owners.</p>
+                <Button className="w-full py-5 text-sm font-bold tracking-widest uppercase">Establish Connection</Button>
+              </Card>
+              <Card onClick={() => setViewMode("admin")} icon={Shield} title="System Root" subtitle="Executive Authority" className="p-10 border-white/5 hover:border-indigo-500/20 group/card transition-all duration-500">
+                <p className="text-slate-500 dark:text-slate-400 mb-10 text-sm font-medium">Global oversight, financial telemetry, and administrative control center.</p>
+                <Button variant="secondary" className="w-full py-5 text-sm font-bold tracking-widest uppercase">Authorize Level 1</Button>
+              </Card>
+            </div>
+          </motion.div>
+) : viewMode === "user" ? (
+       activeTab === "profile" ? (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-4xl mx-auto space-y-6"
+          >
+            <div className="mb-2">
+               <h2 className="text-2xl font-display font-bold text-slate-900 dark:text-white mb-2 tracking-tight">ব্যবহারকারী প্রোফাইল</h2>
+               <p className="text-slate-500 dark:text-slate-400">আপনার ডিজিটাল অ্যাকাউন্ট এবং গাড়ির তথ্য পরিচালনা করুন।</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="p-6 rounded-3xl bg-slate-50 border border-slate-100 dark:bg-slate-800/40 dark:border-slate-800">
+                      <div className="flex items-center gap-3 mb-6">
+                        <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-500">
+                          <Car className="w-5 h-5" />
+                        </div>
+                        <h5 className="font-bold text-slate-900 dark:text-white">যানবাহন তথ্য</h5>
+                      </div>
+                      <div className="space-y-4">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-slate-500">প্লেট নম্বর</span>
+                          <span className="text-sm font-bold text-slate-900 dark:text-indigo-400 font-mono">{user?.carNumber}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-slate-500">যানবাহন ধরন</span>
+                          <span className="text-sm font-bold text-slate-900 dark:text-white capitalize">{user?.carType}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-slate-500">স্ট্যাটাস</span>
+                          <Badge status="completed">সক্রিয়</Badge>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-6 rounded-3xl bg-slate-50 border border-slate-100 dark:bg-slate-800/40 dark:border-slate-800">
+                      <div className="flex items-center gap-3 mb-6">
+                        <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+                          <Shield className="w-5 h-5" />
+                        </div>
+                        <h5 className="font-bold text-slate-900 dark:text-white">নিরাপত্তা ও সেটিংস</h5>
+                      </div>
+                      <div className="space-y-4">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-slate-500">ভেরিফিকেশন</span>
+                          <div className="flex items-center gap-1.5 text-emerald-600 font-bold text-xs">
+                             <CheckCircle2 className="w-3.5 h-3.5" />
+                             ভেরিফাইড
+                          </div>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-slate-500">নোড আইডি</span>
+                          <span className="text-xs font-mono text-slate-400">#ST-{user?.id.slice(0,8).toUpperCase()}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-slate-500">বায়োমেট্রিক</span>
+                          <span className="text-xs font-bold text-slate-400">এনাবেল্ড</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="md:col-span-2 p-6 rounded-3xl bg-slate-50 border border-slate-100 dark:bg-slate-800/40 dark:border-slate-800">
+                      <div className="flex items-center gap-3 mb-6">
+                        <div className="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center text-orange-500">
+                           <UserIcon className="w-5 h-5" />
+                        </div>
+                        <h5 className="font-bold text-slate-900 dark:text-white">যোগাযোগ ও মেম্বারশিপ</h5>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                         <div className="flex items-center gap-3 p-4 rounded-2xl bg-white border border-slate-100 dark:bg-slate-900 dark:border-slate-800">
+                            <Mail className="w-4 h-4 text-slate-400" />
+                            <div className="overflow-hidden">
+                               <p className="text-[10px] text-slate-400 uppercase font-bold tracking-widest">ইমেইল</p>
+                               <p className="text-sm font-bold text-slate-900 dark:text-white truncate">{user?.email}</p>
+                            </div>
+                         </div>
+                         <div className="flex items-center gap-3 p-4 rounded-2xl bg-white border border-slate-100 dark:bg-slate-900 dark:border-slate-800">
+                            <Phone className="w-4 h-4 text-slate-400" />
+                            <div>
+                               <p className="text-[10px] text-slate-400 uppercase font-bold tracking-widest">ফোন</p>
+                               <p className="text-sm font-bold text-slate-900 dark:text-white">{user?.phone || 'যোগ করা হয়নি'}</p>
+                            </div>
+                         </div>
+                         <div className="flex items-center gap-3 p-4 rounded-2xl bg-white border border-slate-100 dark:bg-slate-900 dark:border-slate-800">
+                            <Calendar className="w-4 h-4 text-slate-400" />
+                            <div>
+                               <p className="text-[10px] text-slate-400 uppercase font-bold tracking-widest">জয়েন করেছেন</p>
+                               <p className="text-sm font-bold text-slate-900 dark:text-white">{user?.createdAt ? new Date(user.createdAt).toLocaleDateString("bn-BD") : "মে ২৫, ২০২৪"}</p>
+                            </div>
+                         </div>
+                      </div>
+                    </div>
+                  </div>
+          </motion.div>
+       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8">
           <div className="lg:col-span-4 space-y-6">
             <motion.div
@@ -1324,7 +1475,7 @@ export default function App() {
                       <span className="text-indigo-100/60 text-[10px] font-bold uppercase tracking-[0.2em] mb-1">ডিজিটাল টোল কার্ড</span>
                       <div className="flex items-center gap-2">
                          <div className="w-8 h-6 bg-gradient-to-br from-amber-300 to-amber-500 rounded-md shadow-inner" />
-                         <span className="text-white font-display font-bold">SMART PASS</span>
+                         <span className="text-white font-display font-bold">SWIFT TOLL</span>
                       </div>
                     </div>
                     <div className="flex -space-x-2">
@@ -1399,10 +1550,10 @@ export default function App() {
               </div>
 
               <Button
-                className="w-full mt-3 flex items-center justify-center gap-2 py-4"
+                className="w-full mt-4 py-4 shadow-xl"
                 onClick={handleRecharge}
+                icon={Plus}
               >
-                <Plus className="w-5 h-5" />
                 রিচার্জ রিকোয়েস্ট পাঠান
               </Button>
             </motion.div>
@@ -1415,26 +1566,27 @@ export default function App() {
             className="lg:col-span-8 flex flex-col min-h-[500px]"
           >
             <Card className="p-4 sm:p-6 bg-white border-2 border-slate-200 min-h-full flex flex-col shadow-xl dark:bg-slate-900/60 dark:border-slate-800 dark:backdrop-blur-xl">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 z-30 py-2 sm:py-0 dark:bg-slate-950 dark:sm:bg-transparent">
-              <div className="flex gap-1 bg-slate-100 p-1.5 rounded-2xl w-full sm:w-auto dark:bg-slate-800/50">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 z-30 py-2 sm:py-0">
+              <div className="flex gap-1 bg-slate-100 p-1.5 rounded-2xl w-full sm:w-auto dark:bg-slate-800/80">
                 <button
                   onClick={() => setActiveTab("travel")}
-                  className={`flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === "travel" ? "bg-white text-slate-900 shadow-md shadow-slate-200/50 dark:bg-slate-900 dark:text-white dark:shadow-slate-900/50" : "text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300"}`}
+                  className={`flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === "travel" ? "bg-white text-slate-900 shadow-sm dark:bg-slate-700 dark:text-white" : "text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300"}`}
                 >
                   ট্রাভেল হিস্ট্রি
                 </button>
                 <button
                   onClick={() => setActiveTab("balance")}
-                  className={`flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === "balance" ? "bg-white text-slate-900 shadow-md shadow-slate-200/50 dark:bg-slate-900 dark:text-white dark:shadow-slate-900/50" : "text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300"}`}
+                  className={`flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === "balance" ? "bg-white text-slate-900 shadow-sm dark:bg-slate-700 dark:text-white" : "text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300"}`}
                 >
                   রিচার্জ হিস্ট্রি
                 </button>
+
               </div>
 
               {activeTab === "travel" && (
                 <button
                   onClick={handleDownloadUserData}
-                  className="text-indigo-600 hover:text-indigo-700 text-sm font-bold flex items-center gap-1.5 group p-2 rounded-xl hover:bg-indigo-50 transition-all self-end sm:self-auto dark:text-indigo-400 dark:hover:bg-indigo-500/20"
+                  className="text-indigo-600 hover:text-indigo-700 text-sm font-bold flex items-center gap-1.5 group p-2 rounded-xl hover:bg-slate-100 transition-all self-end sm:self-auto dark:text-indigo-400 dark:hover:bg-white/5"
                 >
                   <Download className="w-4 h-4 group-hover:scale-110 transition-transform" />
                   রিপোর্ট ডাউনলোড
@@ -1503,68 +1655,70 @@ export default function App() {
                       </p>
                     </div>
                   )
-                ) : balanceHistory.length > 0 ? (
- balanceHistory.slice(0, 6).map((item, idx) => (
- <motion.div
- key={item.id}
- initial={{ opacity: 0, y: 10 }}
- animate={{ opacity: 1, y: 0 }}
- transition={{ delay: idx * 0.05 }}
- className="group p-5 rounded-3xl bg-slate-50 border border-transparent hover:border-slate-200 hover:bg-white hover:shadow-xl hover:shadow-slate-100 transition-all flex justify-between items-center dark:bg-slate-800/40"
- >
- <div className="flex items-center gap-5">
- <div
- className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform ${item.type === "recharge" ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400" : "bg-slate-100 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 dark:text-slate-400"}`}
- >
- {item.type === "recharge" ? (
- <TrendingUp className="w-6 h-6" />
- ) : (
- <Clock className="w-6 h-6" />
- )}
- </div>
- <div>
- <p className="font-display font-bold text-slate-900 text-lg dark:text-white">
- {item.type === "recharge"
- ? "রিচার্জ"
- : "টোল পেমেন্ট"}
- </p>
- <p className="text-xs text-slate-400 font-semibold tracking-wide mt-0.5 dark:text-slate-400">
- {new Date(
- item.timestamp,
- ).toLocaleDateString("bn-BD", {
- day: "numeric",
- month: "long",
- hour: "numeric",
- minute: "numeric",
- })}
- </p>
- </div>
- </div>
- <div className="text-right">
- <p
- className={`font-display font-bold text-lg ${item.type === "recharge" ? "text-emerald-600" : "text-slate-900 dark:text-white"}`}
- >
- {item.type === "recharge" ? "+" : "-"}৳
- {item.amount}
- </p>
- <Badge status={item.status}>
- {item.status === "completed"
- ? "সফল"
- : item.status === "pending"
- ? "পেন্ডিং"
- : "বাতিল"}
- </Badge>
- </div>
- </motion.div>
- ))
- ) : (
- <div className="flex flex-col items-center justify-center py-32 text-slate-300">
- <History className="w-16 h-16 mb-4 opacity-10" />
- <p className="font-medium">
- কোনো লেনদেন পাওয়া যায়নি
- </p>
- </div>
- )}
+                ) : activeTab === "balance" ? (
+                  balanceHistory.length > 0 ? (
+                    balanceHistory.slice(0, 6).map((item, idx) => (
+                      <motion.div
+                        key={item.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: idx * 0.05 }}
+                        className="group p-5 rounded-3xl bg-slate-50 border border-transparent hover:border-slate-200 hover:bg-white hover:shadow-xl hover:shadow-slate-100 transition-all flex justify-between items-center dark:bg-slate-800/40"
+                      >
+                        <div className="flex items-center gap-5">
+                          <div
+                            className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform ${item.type === "recharge" ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400" : "bg-slate-100 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400"}`}
+                          >
+                            {item.type === "recharge" ? (
+                              <TrendingUp className="w-6 h-6" />
+                            ) : (
+                              <Clock className="w-6 h-6" />
+                            )}
+                          </div>
+                          <div>
+                            <p className="font-display font-bold text-slate-900 text-lg dark:text-white">
+                              {item.type === "recharge"
+                                ? "রিচার্জ"
+                                : "টোল পেমেন্ট"}
+                            </p>
+                            <p className="text-xs text-slate-400 font-semibold tracking-wide mt-0.5 dark:text-slate-400">
+                              {new Date(
+                                item.timestamp,
+                              ).toLocaleDateString("bn-BD", {
+                                day: "numeric",
+                                month: "long",
+                                hour: "numeric",
+                                minute: "numeric",
+                              })}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p
+                            className={`font-display font-bold text-lg ${item.type === "recharge" ? "text-emerald-600" : "text-slate-900 dark:text-white"}`}
+                          >
+                            {item.type === "recharge" ? "+" : "-"}৳
+                            {item.amount}
+                          </p>
+                          <Badge status={item.status}>
+                            {item.status === "completed"
+                              ? "সফল"
+                              : item.status === "pending"
+                                ? "পেন্ডিং"
+                                : "বাতিল"}
+                          </Badge>
+                        </div>
+                      </motion.div>
+                    ))
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-32 text-slate-300">
+                      <CreditCard className="w-16 h-16 mb-4 opacity-10" />
+                      <p className="font-medium">
+                        কোনো লেনদেন পাওয়া যায়নি
+                      </p>
+                    </div>
+                  )
+                ) : null}
  </motion.div>
  </AnimatePresence>
             <div className="mt-8 pt-8 border-t border-slate-100 flex flex-col items-center text-center dark:border-slate-800/60">
@@ -1582,7 +1736,7 @@ export default function App() {
  </Card>
           </motion.div>
         </div>
-      ) : (
+      ) ) : (
  <div className="space-y-8">
  <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
  <div>
@@ -1850,7 +2004,7 @@ export default function App() {
  <Button
  onClick={() => setShowAddUserModal(true)}
  icon={Plus}
- className="w-full sm:w-auto shadow-lg shadow-indigo-100"
+ className="w-full sm:w-auto shadow-lg shadow-indigo-100 dark:shadow-none"
  >
  নতুন ব্যবহারকারী
  </Button>
@@ -2472,7 +2626,8 @@ export default function App() {
  )}
  </div>
  )}
- </main>
+         </AnimatePresence>
+      </main>
 
  {/* Add User Modal */}
  <Modal

@@ -7,6 +7,7 @@ export interface User {
   balance: number;
   role: 'admin' | 'user';
   password?: string;
+  phone?: string;
   rfid?: string;
   profilePic?: string;
   createdAt?: any;
