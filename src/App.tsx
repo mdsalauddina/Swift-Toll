@@ -2271,8 +2271,8 @@ export default function App() {
  </Card>
  </div>
  ) : (
- <div className="space-y-8">
- <div className="flex justify-between items-center bg-white p-4 rounded-3xl border border-slate-100 shadow-sm dark:bg-slate-900 dark:border-slate-800/60">
+ <div id="printable-report" className="space-y-8">
+ <div className="flex justify-between items-center bg-white p-4 rounded-3xl border border-slate-100 shadow-sm print:hidden dark:bg-slate-900 dark:border-slate-800/60">
  <div>
  <h4 className="font-bold text-slate-900 dark:text-white">
  ইনকাম এবং ট্রানজ্যাকশন রিপোর্ট
